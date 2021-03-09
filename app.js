@@ -6,7 +6,7 @@ const server = http.Server(app);
 const app = express();
 const io = socket(server);
 
-const port = 3000;
+const port = process.env.port;
 
 app.use(express.static(__dirname + "/"));
 app.set("views", "views");
