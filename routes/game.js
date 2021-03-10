@@ -1,13 +1,15 @@
+var app = require("../app");
+var cors = require("cors");
 var express = require('express');
 var router = express.Router();
 
-/* GET users listing. */
+/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+  res.send("합격")
 });
 
 router.get("/list", (req, res) => {
-  res.send("유야호~");
+  res.render('list');
 });
 
 module.exports = router;

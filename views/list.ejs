@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GAME LIST</title>
+    </head>
+    <body>
+    </body>
+    <script src="../javascripts/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on("testtest", (a) => {
+            console.log(a);
+        });
+
+        socket.emit("test", "소야호");
+    </script>
+</html>
