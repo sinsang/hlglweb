@@ -4,6 +4,10 @@
         <title>GAME LIST</title>
     </head>
     <body>
+        <%= user %>
+        <form action="../game/logout" method="POST">
+            <input type="submit" value="로그아웃">
+        </form>
     </body>
     <script src="../javascripts/socket.io.js"></script>
     <script>
@@ -13,6 +17,6 @@
             console.log(a);
         });
 
-        socket.emit("test", "소야호");
+        socket.emit("test", "<%= user %> 무야호");
     </script>
 </html>

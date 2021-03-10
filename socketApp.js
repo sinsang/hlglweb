@@ -1,5 +1,3 @@
-var app = require('./app');
-
 // socket.io
 exports.test = (socket) => {
   console.log("SOMEBODY HERE");

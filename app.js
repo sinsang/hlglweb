@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require("cors");
+var bodyParser = require("body-parser");
+var session = require("express-session");
+var FileStore = require("session-file-store")(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -21,6 +24,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded({extended: false}));
+
+// sessions
+exports.nowUsers = [];
+exports.nowRooms = [];
+
+var fileStoreOption = {
+  reapInterval : 60
+}
+
+app.use(session({
+  secret : "12312dajfj23rj2po4$#%@#",
+  resave : false,
+  saveUninitialized : true,
+  store : new FileStore(fileStoreOption),
+  //cookie : {maxAge : 60 * 30},
+  //rolling : true
+}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -46,7 +67,6 @@ app.use(function(err, req, res, next) {
 var socketApp = require("./socketApp");
 
 app.io = require("socket.io")();
-
 app.io.on("connection", socketApp.test);
 
 module.exports = app;
