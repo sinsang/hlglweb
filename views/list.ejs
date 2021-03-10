@@ -4,9 +4,23 @@
         <title>GAME LIST</title>
     </head>
     <body>
-        <%= user %>
+        <%= user.name %>님, 환영합니다.
         <form action="../game/logout" method="POST">
             <input type="submit" value="로그아웃">
+        </form>
+        
+        <ul>
+        <% for (var i = 0; i < rooms.length; i++) { %>
+            <li><%= rooms[i].hostName %>의 방</li>
+        <% } %>
+        </ul>
+
+        <br/>
+        방 생성하기
+        <form action="../game/makeRoom" method="POST">
+            <input type="text" name="hostName" value="<%= user.name %>" style="display: none;">
+            <input type="text" name="password" placeholder="패스워드">
+            <input type="submit" value="방 생성">
         </form>
     </body>
     <script src="../javascripts/socket.io.js"></script>

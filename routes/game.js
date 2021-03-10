@@ -16,6 +16,20 @@ router.get("/login", (req, res, next) => {
   }
 });
 
+router.get("/list", (req, res) => {
+  console.log(req.session.user);
+  if (req.session.user){
+    //console.log(req.session.user);
+    res.render('list', {
+      user : req.session.user,
+      rooms : app.nowRooms
+    });
+  }
+  else{
+    res.redirect("../game/login");
+  }
+});
+
 router.post("/check", (req, res, next) => {
 
   var reqName = req.body.username;
@@ -29,8 +43,7 @@ router.post("/check", (req, res, next) => {
   }
   
   app.nowUsers.push(newUser);
-  console.log(req.session);
-  req.session.user = reqName;
+  req.session.user = newUser;
 
   console.log(app.nowUsers);
   
@@ -39,21 +52,33 @@ router.post("/check", (req, res, next) => {
 });
 
 router.post("/logout", (req, res, next) => {
+  app.nowUsers.splice(app.nowUsers.indexOf(req.session.user), 1);
   delete req.session.user;
   res.redirect("../game/login");
 });
 
-router.get("/list", (req, res) => {
-  console.log(req.session.user);
-  if (req.session.user){
-    //console.log(req.session.user);
-    res.render('list', {
-      user : req.session.user
-    });
+router.post("/makeRoom", (req, res, next) => {
+  
+  var newRoom = {
+    id : 0,
+    hostName : req.body.hostName,
+    password : req.body.password,
+    time : req.body.time,
+    surfaceCardsSum : [0, 0, 0, 0],
+    playerSurfaceCard : [],
+    players : [],  
   }
-  else{
-    res.redirect("../game/login");
+
+  var testRoom = {
+    hostName : req.body.hostName,
+    password : req.body.password
   }
+
+  app.nowRooms.push(testRoom);
+  console.log(app.nowRooms);
+
+  res.redirect("../game/list")
+
 });
 
 module.exports = router;
