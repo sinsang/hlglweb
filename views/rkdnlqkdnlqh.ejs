@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> 가위바위보 </title>
+    </head>
+    <body>
+        <button id="rkdnl">가위</button>
+        <button id="qkdnl">바위</button>
+        <button id="qh">보</button>
+    </body>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="../../javascripts/socket.io.js"></script>
+    <script>
+        var socket = io();
+        socket.on("testtest", (data) => {
+            console.log(data);
+        });
+
+        socket.emit("joinRoom", { index : <%= index %>, hostName : "<%= hostName %>"});
+    </script>
+</html>

@@ -1,8 +1,17 @@
+var app = require("./app");
+
 // socket.io
 exports.test = (socket) => {
-  console.log("SOMEBODY HERE");
-  socket.on("test", (a) => {
-    console.log(a);
-    socket.emit("testtest", a);
+  
+  socket.on("joinRoom", (info) => {
+    if (app.nowRooms[info.index].hostName == info.hostName){
+      socket.join(app.nowRooms[info.index].hostName);
+      console.log("조인" + info.index + " " + app.nowRooms[info.index].hostName);
+      console.log(socket.rooms);
+    }
+  });
+
+  socket.on("test", (hostName) => {
+    socket.to(hostName).emit("testtest", hostName);
   });
 }

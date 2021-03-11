@@ -9,9 +9,9 @@
             <input type="submit" value="로그아웃">
         </form>
         
-        <ul>
+        <ul id="gameList">
         <% for (var i = 0; i < rooms.length; i++) { %>
-            <li><%= rooms[i].hostName %>의 방</li>
+            <li id="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>"><%= rooms[i].hostName %>의 방</li>
         <% } %>
         </ul>
 
@@ -23,14 +23,49 @@
             <input type="submit" value="방 생성">
         </form>
     </body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="../javascripts/socket.io.js"></script>
     <script>
-        var socket = io();
-
-        socket.on("testtest", (a) => {
-            console.log(a);
+        $("#gameList").children().each((index, item) => {
+            $(item).click((e) => {
+                index = index;
+                gameId = $(item).attr("id");
+                isLocked = eval($(item).attr("lock"));
+                pwd = null;
+                playerId = "<%= user.name %>";
+                if (isLocked){
+                    pwd = prompt("비밀번호를 입력하세요");
+                    $.ajax({
+                        url : "../game/enterRoom",
+                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId },
+                        type : "POST",
+                        dataType : "json"
+                    })
+                    .done((data) =>{
+                        console.log(data.result);
+                        if (data.result){
+                            location.href = "../game/play/" + index;           
+                        }
+                        else {
+                            alert("잘못된 패스워드입니다.");
+                        }
+                    });
+                }
+                else if (confirm($(item).attr("id") + "의 방에 입장하겠습니까?")){
+                    $.ajax({
+                        url : "../game/enterRoom",
+                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId },
+                        type : "POST",
+                        dataType : "json"
+                    })
+                    .done((data) =>{
+                        console.log(data.result);
+                        if (data.result){
+                            location.href = "../game/play/" + index;
+                        }
+                    });
+                }
+            });
         });
-
-        socket.emit("test", "<%= user %> 무야호");
     </script>
 </html>

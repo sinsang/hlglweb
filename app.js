@@ -29,6 +29,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 // sessions
 exports.nowUsers = [];
 exports.nowRooms = [];
+exports.nowPwds = [];
 
 var fileStoreOption = {
   reapInterval : 60
