@@ -24,8 +24,8 @@ exports.pushHand = (socket, io, info) => {
       socket.emit("wait", "상대 플레이어가 내기를 기다리는 중..");
     }
     else {
-      var first = app.nowRooms[info.roomNum].playersHand[0];
-      var second = app.nowRooms[info.roomNum].playersHand[1];
+      var first = eval(app.nowRooms[info.roomNum].playersHand[0]);
+      var second = eval(app.nowRooms[info.roomNum].playersHand[1]);
 
       if (first == second){
         io.sockets.in(app.nowRooms[info.roomNum].hostName).emit("result", -1);
@@ -58,6 +58,7 @@ exports.pushHand = (socket, io, info) => {
         second : [app.nowRooms[info.roomNum].players[1], tmp[second-1]], 
         winner : app.nowRooms[info.roomNum].players[winner]
       });
+      app.nowRooms[info.roomNum].playersHand = [0, 0];
       
     }
   }
