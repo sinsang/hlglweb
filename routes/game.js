@@ -121,6 +121,7 @@ router.post("/enterRoom", (req, res, next) => {
   if (app.nowRooms[index].hostName == gameId && app.nowPwds[index].hostName == gameId){
     if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd){
       app.nowRooms[index].players.push(playerId);
+      app.nowRooms[index].playersHand.push(0);
       res.send({result : true});
       return;
     }

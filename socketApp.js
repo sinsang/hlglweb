@@ -18,7 +18,6 @@ exports.pushHand = (socket, io, info) => {
       socket.emit("wait", "상대 플레이어가 없습니다. 기다려주세요.");
       return;
     }
-    console.log(app.nowRooms[info.roomNum].players);
     app.nowRooms[info.roomNum].playersHand[app.nowRooms[info.roomNum].players.indexOf(info.playerId)] = info.hand;
     console.log(app.nowRooms[info.roomNum].playersHand);
     if (app.nowRooms[info.roomNum].playersHand[0] == 0 || app.nowRooms[info.roomNum].playersHand[1] == 0){
