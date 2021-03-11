@@ -18,17 +18,18 @@ exports.pushHand = (socket, io, info) => {
       socket.emit("wait", "상대 플레이어가 없습니다. 기다려주세요.");
       return;
     }
-    app.nowRooms[info.roomNum].playersHand[app.nowRooms[info.roomNum].players.indexOf(info.playerId)] = info.hand;
+    app.nowRooms[info.roomNum].playersHand[app.nowRooms[info.roomNum].players.indexOf(info.playerId)] = (info.hand*1);
     console.log(app.nowRooms[info.roomNum].playersHand);
     if (app.nowRooms[info.roomNum].playersHand[0] == 0 || app.nowRooms[info.roomNum].playersHand[1] == 0){
       socket.emit("wait", "상대 플레이어가 내기를 기다리는 중..");
     }
     else {
-      var first = eval(app.nowRooms[info.roomNum].playersHand[0]);
-      var second = eval(app.nowRooms[info.roomNum].playersHand[1]);
+      var first = app.nowRooms[info.roomNum].playersHand[0]);
+      var second = app.nowRooms[info.roomNum].playersHand[1]);
 
       if (first == second){
         io.sockets.in(app.nowRooms[info.roomNum].hostName).emit("result", -1);
+        app.nowRooms[info.roomNum].playersHand = [0, 0];
         return;
       }
       winner = 0;
