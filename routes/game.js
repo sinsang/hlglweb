@@ -88,8 +88,8 @@ router.post("/makeRoom", (req, res, next) => {
     hostName : req.body.hostName,
     isLocked : false,
     gameMode : 0,
-    players : [],
-    playersHand : [],
+    players : [req.body.hostName],
+    playersHand : [0],
     nowState : 0,
     MAX_PLAYER : 2
   }
@@ -102,7 +102,6 @@ router.post("/makeRoom", (req, res, next) => {
   if (pwd.pwd != ''){
     testRoom.isLocked = true;
   }
-  testRoom.players.push(req.body.hostName);
 
   app.nowRooms.push(testRoom);
   app.nowPwds.push(pwd);
