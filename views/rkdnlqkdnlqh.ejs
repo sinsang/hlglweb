@@ -4,19 +4,46 @@
         <title> 가위바위보 </title>
     </head>
     <body>
-        <button id="rkdnl">가위</button>
-        <button id="qkdnl">바위</button>
-        <button id="qh">보</button>
+        <button class="p" id="rkdnl" value=1>가위</button>
+        <button class="p" id="qkdnl" value=2>바위</button>
+        <button class="p" id="qh" value=3>보</button>
+        <h3 id="myHand"></h3>
+        <h5 id="information"></h5>
     </body>
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="../../javascripts/socket.io.js"></script>
     <script>
         var socket = io();
-        socket.on("testtest", (data) => {
-            console.log(data);
+
+        $(".p").each((index, item) => {
+            $(item).click((e) => {
+                alert("누름");
+                socket.emit("pushHand", {
+                    playerId : "<%= player.name %>",
+                    hand : $(item).attr("value"),
+                    roomNum : <%= roomNum %>
+                });
+           });
         });
 
-        socket.emit("joinRoom", { index : <%= index %>, hostName : "<%= hostName %>"});
+        socket.on("wait", (data) => {
+            $("#information").html($("#information").html() + "<br/> " + data);
+        });
+
+        socket.on("welcome", (player) => {
+            $("#information").html($("#information").html() + "<br/> " + player + "님이 입장하셨습니다.");
+        })
+
+        socket.on("result", (result) => {
+            if (result == -1){
+                $("#information").html($("#information").html() + "<br/> 비겼습니다");    
+            }
+            $("#myHand").html("");
+            $("#information").html($("#information").html() + "<br/> " + result.first[0] + " : " + result.first[1] + "<br/> " + result.second[0] + " : " + result.second[1] + "<br/> 승자는 " + result.winner);
+        });
+
+        socket.emit("joinRoom", { index : <%= roomNum %>, hostName : "<%= hostName %>", playerId : "<%= player.name %>"});
+    
     </script>
 </html>

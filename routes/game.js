@@ -34,7 +34,7 @@ router.get("/play/:roomNum", (req, res, next) => {
 
   if (app.nowRooms[req.params.roomNum].players.indexOf(req.session.user.name) != -1){
     res.render("rkdnlqkdnlqh", {
-      index : req.params.roomNum,
+      roomNum : req.params.roomNum,
       hostName : app.nowRooms[req.params.roomNum].hostName,
       player : req.session.user
     });
@@ -59,8 +59,6 @@ router.post("/check", (req, res, next) => {
   
   app.nowUsers.push(newUser);
   req.session.user = newUser;
-
-  console.log(app.nowUsers);
   
   res.redirect("../game/list");
 
@@ -91,6 +89,8 @@ router.post("/makeRoom", (req, res, next) => {
     isLocked : false,
     gameMode : 0,
     players : [],
+    playersHand : [],
+    nowState : 0,
     MAX_PLAYER : 2
   }
 

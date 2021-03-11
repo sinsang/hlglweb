@@ -65,9 +65,14 @@ app.use(function(err, req, res, next) {
 });
 
 // socket.io
+app.io = require("socket.io")();
 var socketApp = require("./socketApp");
 
-app.io = require("socket.io")();
-app.io.on("connection", socketApp.test);
+app.io.on("connection", (socket) => {
+  
+  socket.on("joinRoom", (info) => {socketApp.joinRoom(socket, app.io, info)});
+  socket.on("pushHand", (info) => {socketApp.pushHand(socket, app.io, info)});
+
+});
 
 module.exports = app;
