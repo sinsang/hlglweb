@@ -12,6 +12,6 @@ exports.test = (socket) => {
   });
 
   socket.on("test", (hostName) => {
-    socket.to(hostName).emit("testtest", hostName);
+    socket.in(hostName).emit("testtest", hostName);
   });
 }
