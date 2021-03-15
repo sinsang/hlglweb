@@ -7,6 +7,7 @@ var cors = require("cors");
 var bodyParser = require("body-parser");
 var session = require("express-session");
 var FileStore = require("session-file-store")(session);
+var ios = require("express-socket.io-session");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -32,17 +33,19 @@ exports.nowRooms = [];
 exports.nowPwds = [];
 
 var fileStoreOption = {
-  reapInterval : 60
+  reapInterval : 600
 }
 
-app.use(session({
+var session = session({
   secret : "12312dajfj23rj2po4$#%@#",
   resave : false,
   saveUninitialized : true,
   store : new FileStore(fileStoreOption),
   //cookie : {maxAge : 60 * 30},
   //rolling : true
-}));
+});
+app.use(session);
+
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -67,11 +70,15 @@ app.use(function(err, req, res, next) {
 // socket.io
 app.io = require("socket.io")();
 var socketApp = require("./socketApp");
+app.io.use(ios(session, { autoSave: true }));
 
 app.io.on("connection", (socket) => {
   
   socket.on("joinRoom", (info) => {socketApp.joinRoom(socket, app.io, info)});
   socket.on("pushHand", (info) => {socketApp.pushHand(socket, app.io, info)});
+  socket.on("hitBell", (info) => {socketApp.hitBell(socket, app.io, info)});
+  socket.on("holdOutCard", (info) => {socketApp.holdOutCard(socket, app.io, info)});
+  socket.on("gameStart", (info) => {socketApp.gameStart(socket, app.io, info)});
 
 });
 
