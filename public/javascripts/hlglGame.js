@@ -9,7 +9,7 @@ var render = (gameInfo) => {
     
     // player render
     $("#gameDiv").html("");
-    for (var i = playerPos; i < playerPos + gameInfo.players.length; i++){
+    for (var i = playerPos; i < gameInfo.players.length; i++){
         var tmp = "<div class=\"player\">" + gameInfo.players[i] + " : " + gameInfo.playerSurfaceCard[i].fruit + ", " + gameInfo.playerSurfaceCard[i].num + "</div>"
         console.log(gameInfo.players[i]);
         $("#gameDiv").append(tmp);
