@@ -6,6 +6,8 @@ var router = express.Router();
 var createNewPlayer = (index, playerId) => {
   app.nowRooms[index].players.push(playerId);
   app.nowRooms[index].gameInfo.players.push(playerId);
+  app.nowRooms[index].playerDeck.push([]);
+  app.nowRooms[index].holdOutDeck.push([]);
   app.nowRooms[index].gameInfo.playerSurfaceCard.push({fruit: 1, num: 0});
   app.nowRooms[index].gameInfo.playerLeftCards.push(0);
   app.nowRooms[index].NOW_PLAYER++;
