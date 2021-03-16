@@ -128,6 +128,7 @@ exports.gameStart = (socket, io, info) => {
     }
 
     app.nowRooms[info.index].isPlaying = true;
+    app.nowRooms[info.index].gameInfo.nowState = 1;
 
     io.sockets.in(info.index).emit("notice", "게임이 시작되었습니다.");
 

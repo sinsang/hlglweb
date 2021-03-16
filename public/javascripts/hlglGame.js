@@ -26,7 +26,10 @@ var render = (gameInfo) => {
     $("#playerStat").html("나의 남은 카드 : " + gameInfo.playerLeftCards[playerPos]);
     // nowTurn render
     $("#nowTurn").html("현재 차례 : " + gameInfo.players[gameInfo.nowTurn]);
-
+    //
+    if (hostName == player && gameInfo.nowState == 0) {
+        $("#hostFunc").css("display", "block");
+    }
 };
 
 // click event
@@ -60,7 +63,3 @@ socket.on("getRoomInfo", (roomInfo) => {
 
 // joinRoom
 socket.emit("joinRoom", {index : roomNum, hostName : hostName, playerId : player});
-
-if (hostName == player) {
-    $("#hostFunc").css("display", "block");
-}
