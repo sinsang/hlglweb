@@ -42,8 +42,6 @@ exports.joinRoom = (socket, io, info) => {
   }
   if (checkPlayer(info, socket) && checkHost(info)){
     socket.join(app.nowRooms[info.index].hostName);
-    //console.log(app.nowRooms[info.index].gameInfo);
-    console.log(socket.handshake.session.user);
     io.sockets.in(app.nowRooms[info.index].hostName).emit("refresh", app.nowRooms[info.index].gameInfo);
   }
   else {
