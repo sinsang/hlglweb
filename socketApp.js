@@ -177,6 +177,7 @@ exports.disconnect = (socket, io) => {
 
     if (isHost({index : room, playerId : player, hostName : hostName}, socket) && app.nowRooms[room].NOW_PLAYER > 0) {
       app.nowRooms[room].hostName = app.nowRooms[room].players[app.nowRooms[room].gameInfo.nowTurn];
+      app.nowPwds[room].hostName = app.nowRooms[room].players[app.nowRooms[room].gameInfo.nowTurn];
     }
 
     socket.handshake.session.user.room = -1;

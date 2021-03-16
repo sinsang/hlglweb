@@ -187,7 +187,7 @@ router.post("/enterRoom", (req, res, next) => {
       res.send({result : false});
       return;
     }
-    else if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd){
+    else if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd) {
       createNewPlayer(index, playerId);
       req.session.user.room = index;
       res.send({result : true});
