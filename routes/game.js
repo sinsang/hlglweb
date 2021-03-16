@@ -154,6 +154,8 @@ router.post("/makeRoom", (req, res, next) => {
   //app.nowRooms.push(testRoom);
   app.nowRooms.push(newRoom);
   app.nowPwds.push(pwd);
+  req.session.user.room = (app.nowRooms.length - 1);
+  req.session.user.hostName = req.body.hostName;
   res.redirect("../game/play/" + (app.nowRooms.length - 1));
 
 });
