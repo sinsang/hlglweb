@@ -25,6 +25,10 @@ var createNewDeck = () => {
   return newDeck;
 }
 
+function isEmpty(param) {
+  return Object.keys(param).length === 0;
+}
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.send("합격")
@@ -73,8 +77,7 @@ router.post("/check", (req, res, next) => {
   var reqName = req.body.username;
   var newUser = {
     name : reqName,
-    room : -1,
-    hostName : ""
+    room : -1
   };
 
   for (var i = 0; i < app.nowUsers.length; i++){
@@ -151,12 +154,23 @@ router.post("/makeRoom", (req, res, next) => {
     newRoom.isLocked = true;
   }
 
-  //app.nowRooms.push(testRoom);
-  app.nowRooms.push(newRoom);
-  app.nowPwds.push(pwd);
-  req.session.user.room = (app.nowRooms.length - 1);
-  req.session.user.hostName = req.body.hostName;
-  res.redirect("../game/play/" + (app.nowRooms.length - 1));
+  var index = -1;
+  for (var i = 0; i < app.MAX_ROOM; i++) {
+    if (isEmpty(app.nowRooms[i])) {
+      index = i;
+      break;
+    }
+  }
+
+  if (index > -1){
+    app.nowRooms[index] = newRoom;
+    app.nowPwds[index] = pwd;
+    req.session.user.room = index;
+    res.redirect("../game/play/" + index);
+  }
+  else {
+    res.send("방을 생성할 수 없습니다.");
+  }
 
 });
 
@@ -176,7 +190,6 @@ router.post("/enterRoom", (req, res, next) => {
     else if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd){
       createNewPlayer(index, playerId);
       req.session.user.room = index;
-      req.session.user.hostName = app.nowRooms[index].hostName;
       res.send({result : true});
       return;
     }

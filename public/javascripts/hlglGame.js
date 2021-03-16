@@ -2,6 +2,7 @@ var socket = io();
 
 var game = {};
 var info = {index : roomNum, hostName : hostName, playerId : player};
+  
 
 // 게임 정보에 맞게 렌더링
 var render = (gameInfo) => {
@@ -51,6 +52,10 @@ socket.on("notice", (text) => {
 socket.on("refresh", (gameInfo) => {
     game = gameInfo;
     render(game);
+});
+
+socket.on("getRoomInfo", (roomInfo) => {
+    console.log(roomInfo);
 });
 
 // joinRoom

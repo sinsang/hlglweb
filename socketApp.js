@@ -31,12 +31,18 @@ function shuffle(sourceArray) {
   }
   return sourceArray;
 }
+function isEmpty(param) {
+  return Object.keys(param).length === 0;
+}
 
 // socket Fucntion
 exports.joinRoom = (socket, io, info) => {
+  if (isEmpty(app.nowRooms[info.index])){
+    return;
+  }
   if (checkPlayer(info, socket) && checkHost(info)){
     socket.join(app.nowRooms[info.index].hostName);
-    console.log(app.nowRooms[info.index].gameInfo);
+    //console.log(app.nowRooms[info.index].gameInfo);
     console.log(socket.handshake.session.user);
     io.sockets.in(app.nowRooms[info.index].hostName).emit("refresh", app.nowRooms[info.index].gameInfo);
   }
@@ -46,6 +52,9 @@ exports.joinRoom = (socket, io, info) => {
 };
 
 exports.hitBell = (socket, io, info) => {
+  if (isEmpty(app.nowRooms[info.index])){
+    return;
+  }
   if (checkPlayer(info, socket) && checkHost(info)){
     if (app.nowRooms[info.index].surfaceCardsSum.indexOf(5) != -1){
       io.sockets.in(app.nowRooms[info.index].hostName).emit("notice", info.playerId + "님이 이겼습니다.");
@@ -62,7 +71,9 @@ exports.hitBell = (socket, io, info) => {
 };
 
 exports.holdOutCard = (socket, io, info) => {
-
+  if (isEmpty(app.nowRooms[info.index])){
+    return;
+  }
   if (checkPlayer(info, socket) && checkHost(info)){
     var playerIndex = app.nowRooms[info.index].gameInfo.players.indexOf(info.playerId);
     if (app.nowRooms[info.index].gameInfo.nowTurn != playerIndex){
@@ -76,10 +87,10 @@ exports.holdOutCard = (socket, io, info) => {
       // 카드 내밀기
       console.log(app.nowRooms[info.index].playerDeck[playerIndex]);
       var getCard = app.nowRooms[info.index].playerDeck[playerIndex].pop();      
-      app.nowRooms[info.index].gameInfo.playerSurfaceCard[playerIndex] = getCard;
       app.nowRooms[info.index].holdOutDeck[playerIndex].push(getCard);
 
       app.nowRooms[info.index].surfaceCardsSum[app.nowRooms[info.index].gameInfo.playerSurfaceCard[playerIndex].fruit - 1] -= app.nowRooms[info.index].gameInfo.playerSurfaceCard[playerIndex].num
+      app.nowRooms[info.index].gameInfo.playerSurfaceCard[playerIndex] = getCard;
       app.nowRooms[info.index].surfaceCardsSum[getCard.fruit - 1] += getCard.num;
 
       app.nowRooms[info.index].gameInfo.playerLeftCards[playerIndex]--;
@@ -100,7 +111,9 @@ exports.holdOutCard = (socket, io, info) => {
 };
 
 exports.gameStart = (socket, io, info) => {
-  
+  if (isEmpty(app.nowRooms[info.index])){
+    return;
+  }
   if (isHost(info, socket)){
     var newDeck = createNewDeck();
     
@@ -112,8 +125,6 @@ exports.gameStart = (socket, io, info) => {
       for (var j = 0; j < cardPerPlayer; j++){
         app.nowRooms[info.index].playerDeck[i].push(newDeck.pop());
       }
-      console.log(app.nowRooms[info.index].playerDeck[i]);
-      console.log(app.nowRooms[info.index].playerDeck[i].length);
       app.nowRooms[info.index].gameInfo.playerLeftCards[i] = app.nowRooms[info.index].playerDeck[i].length;
       app.nowRooms[info.index].gameInfo.nowTurn = 0;
     }
@@ -139,7 +150,11 @@ exports.disconnect = (socket, io) => {
 
   var player = socket.handshake.session.user.name;
   var room = socket.handshake.session.user.room;
-  var hostName = socket.handshake.session.user.hostName;
+  var hostName = app.nowRooms[room].hostName;
+
+  if (isEmpty(app.nowRooms[room])){
+    return;
+  }
 
   if (checkHost({index : room, hostName : hostName}) && app.nowRooms[room].players.indexOf(player) != -1) {
     var index = app.nowRooms[room].players.indexOf(player);
@@ -160,8 +175,14 @@ exports.disconnect = (socket, io) => {
       app.nowRooms[room].gameInfo.nowTurn %= app.nowRooms[room].NOW_PLAYER;
     }
 
+    if (isHost({index : room, playerId : player, hostName : hostName}, socket) && app.nowRooms[room].NOW_PLAYER > 0) {
+      app.nowRooms[room].hostName = app.nowRooms[room].players[app.nowRooms[room].gameInfo.nowTurn];
+    }
+
+    socket.handshake.session.user.room = -1;
+
     if (app.nowRooms[room].NOW_PLAYER < 1){
-      app.nowRooms.splice(room, 1);
+      app.nowRooms[room] = {};
     }
     else {
       io.sockets.in(hostName).emit("refresh", app.nowRooms[room].gameInfo);
@@ -169,6 +190,11 @@ exports.disconnect = (socket, io) => {
 
   }
 
+}
+
+exports.getRoom = (socket, io, info) => {
+  console.log("야호");
+  io.sockets.in(info.hostName).emit("getRoomInfo", app.nowRooms[info.index]);
 }
 
 exports.pushHand = (socket, io, info) => {

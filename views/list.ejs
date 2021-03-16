@@ -9,9 +9,12 @@
             <input type="submit" value="로그아웃">
         </form>
         
+        <% function isEmpty(param) { return Object.keys(param).length === 0; } %>
         <ul id="gameList">
         <% for (var i = 0; i < rooms.length; i++) { %>
+            <% if (!isEmpty(rooms[i])) { %>
             <li id="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>" isPlaying="<%= rooms[i].isPlaying %>"><%= rooms[i].hostName %>의 방</li>
+            <% } %>
         <% } %>
         </ul>
 
@@ -26,6 +29,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="../javascripts/socket.io.js"></script>
     <script>
+
         $("#gameList").children().each((index, item) => {
             $(item).click((e) => {
                 index = index;

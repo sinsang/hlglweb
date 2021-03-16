@@ -29,8 +29,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 // sessions
 exports.nowUsers = [];
-exports.nowRooms = [];
-exports.nowPwds = [];
+exports.nowRooms = [{}, {}, {}, {}, {}];
+exports.nowPwds = [{}, {}, {}, {}, {}];
+
+exports.MAX_ROOM = 5;
 
 var fileStoreOption = {
   reapInterval : 600
@@ -80,6 +82,8 @@ app.io.on("connection", (socket) => {
   socket.on("holdOutCard", (info) => {socketApp.holdOutCard(socket, app.io, info)});
   socket.on("gameStart", (info) => {socketApp.gameStart(socket, app.io, info)});
   socket.on("disconnect", () => {socketApp.disconnect(socket, app.io)});
+
+  socket.on("getRoom", (info) => {socketApp.getRoom(socket, app.io, info)});
 });
 
 module.exports = app;
