@@ -40,7 +40,7 @@ router.get("/login", (req, res, next) => {
 });
 
 router.get("/list", (req, res) => {
-  console.log(req.session.user);
+  //console.log(req.session.user);
   if (req.session.user){
     res.render('list', {
       user : req.session.user,
@@ -71,7 +71,11 @@ router.get("/play/:roomNum", (req, res, next) => {
 router.post("/check", (req, res, next) => {
 
   var reqName = req.body.username;
-  var newUser = {name : reqName};
+  var newUser = {
+    name : reqName,
+    room : -1,
+    hostName : ""
+  };
 
   for (var i = 0; i < app.nowUsers.length; i++){
     if (app.nowUsers[i].name == reqName){
@@ -115,7 +119,7 @@ router.post("/makeRoom", (req, res, next) => {
     id : 0,
     hostName : req.body.hostName,
     isLocked : false,
-    state : 0,        
+    isPlaying : false,        
     gameMode : 0,
     players : [req.body.hostName],
     surfaceCardsSum : [0, 0, 0, 0],   // 내민 카드 중 표면들의 총 합
@@ -163,8 +167,14 @@ router.post("/enterRoom", (req, res, next) => {
 
   //console.log(pwd, app.nowPwds[index].pwd);
   if (app.nowRooms[index].hostName == gameId && app.nowPwds[index].hostName == gameId){
-    if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd){
+    if (app.nowRooms[index].isPlaying){
+      res.send({result : false});
+      return;
+    }
+    else if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd){
       createNewPlayer(index, playerId);
+      req.session.user.room = index;
+      req.session.user.hostName = app.nowRooms[index].hostName;
       res.send({result : true});
       return;
     }

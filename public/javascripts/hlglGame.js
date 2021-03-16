@@ -2,6 +2,7 @@ var socket = io();
 
 var game = {};
 var info = {index : roomNum, hostName : hostName, playerId : player};
+
 // 게임 정보에 맞게 렌더링
 var render = (gameInfo) => {
 
@@ -22,6 +23,8 @@ var render = (gameInfo) => {
     
     // player stat render
     $("#playerStat").html("나의 남은 카드 : " + gameInfo.playerLeftCards[playerPos]);
+    // nowTurn render
+    $("#nowTurn").html("현재 차례 : " + gameInfo.players[gameInfo.nowTurn]);
 
 };
 
@@ -32,6 +35,11 @@ $("#bell").click((e) => {
 
 $("#myDeck").click((e) => {
     socket.emit("holdOutCard", info);
+});
+
+$("#gameStart").click((e) => {
+    socket.emit("gameStart", info);
+    $("#hostFunc").css("display", "none");
 });
 
 // from Server
@@ -47,3 +55,7 @@ socket.on("refresh", (gameInfo) => {
 
 // joinRoom
 socket.emit("joinRoom", {index : roomNum, hostName : hostName, playerId : player});
+
+if (hostName == player) {
+    $("#hostFunc").css("display", "block");
+}

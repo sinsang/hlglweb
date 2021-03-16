@@ -11,7 +11,7 @@
         
         <ul id="gameList">
         <% for (var i = 0; i < rooms.length; i++) { %>
-            <li id="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>"><%= rooms[i].hostName %>의 방</li>
+            <li id="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>" isPlaying="<%= rooms[i].isPlaying %>"><%= rooms[i].hostName %>의 방</li>
         <% } %>
         </ul>
 
@@ -31,9 +31,14 @@
                 index = index;
                 gameId = $(item).attr("id");
                 isLocked = eval($(item).attr("lock"));
+                isPlaying = eval($(item).attr("isPlaying"))
                 pwd = null;
                 playerId = "<%= user.name %>";
-                if (isLocked){
+                
+                if (isPlaying) {
+                    alert("해당 방은 이미 플레이 중입니다.");
+                }
+                else if (isLocked) {
                     pwd = prompt("비밀번호를 입력하세요");
                     $.ajax({
                         url : "../game/enterRoom",
@@ -43,7 +48,7 @@
                     })
                     .done((data) =>{
                         console.log(data.result);
-                        if (data.result){
+                        if (data.result) {
                             location.href = "../game/play/" + index;           
                         }
                         else {
@@ -51,7 +56,7 @@
                         }
                     });
                 }
-                else if (confirm($(item).attr("id") + "의 방에 입장하겠습니까?")){
+                else if (confirm($(item).attr("id") + "의 방에 입장하겠습니까?")) {
                     $.ajax({
                         url : "../game/enterRoom",
                         data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId },
