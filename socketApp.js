@@ -41,7 +41,7 @@ exports.joinRoom = (socket, io, info) => {
     return;
   }
   if (checkPlayer(info, socket) && checkHost(info)){
-    socket.join(app.nowRooms[info.index].hostName);
+    socket.join(info.index);
     io.sockets.in(app.nowRooms[info.index].hostName).emit("refresh", app.nowRooms[info.index].gameInfo);
   }
   else {
@@ -55,12 +55,12 @@ exports.hitBell = (socket, io, info) => {
   }
   if (checkPlayer(info, socket) && checkHost(info)){
     if (app.nowRooms[info.index].surfaceCardsSum.indexOf(5) != -1){
-      io.sockets.in(app.nowRooms[info.index].hostName).emit("notice", info.playerId + "님이 이겼습니다.");
-      io.sockets.in(app.nowRooms[info.index].hostName).emit("refresh", app.nowRooms[info.index].gameInfo);
+      io.sockets.in(info.index).emit("notice", info.playerId + "님이 이겼습니다.");
+      io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
     }
     else {
-      io.sockets.in(app.nowRooms[info.index].hostName).emit("notice", info.playerId + "님이 잘못 종을 쳤습니다.");
-      io.sockets.in(app.nowRooms[info.index].hostName).emit("refresh", app.nowRooms[info.index].gameInfo);
+      io.sockets.in(info.index).emit("notice", info.playerId + "님이 잘못 종을 쳤습니다.");
+      io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
     }
   }
   else {
@@ -98,8 +98,8 @@ exports.holdOutCard = (socket, io, info) => {
       app.nowRooms[info.index].gameInfo.nowTurn %= app.nowRooms[info.index].NOW_PLAYER; 
 
       // 클라이언트로 정보 전달
-      io.sockets.in(app.nowRooms[info.index].hostName).emit("notice", info.playerId + "님이 카드를 냈습니다.");
-      io.sockets.in(app.nowRooms[info.index].hostName).emit("refresh", app.nowRooms[info.index].gameInfo);
+      io.sockets.in(info.index).emit("notice", info.playerId + "님이 카드를 냈습니다.");
+      io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
     
     }
   }
@@ -129,7 +129,7 @@ exports.gameStart = (socket, io, info) => {
 
     app.nowRooms[info.index].isPlaying = true;
 
-    io.sockets.in(app.nowRooms[info.index].hostName).emit("notice", "게임이 시작되었습니다.");
+    io.sockets.in(info.index).emit("notice", "게임이 시작되었습니다.");
 
   }
   else {
@@ -184,7 +184,7 @@ exports.disconnect = (socket, io) => {
       app.nowRooms[room] = {};
     }
     else {
-      io.sockets.in(hostName).emit("refresh", app.nowRooms[room].gameInfo);
+      io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
     }
 
   }
@@ -193,7 +193,7 @@ exports.disconnect = (socket, io) => {
 
 exports.getRoom = (socket, io, info) => {
   console.log("야호");
-  io.sockets.in(info.hostName).emit("getRoomInfo", app.nowRooms[info.index]);
+  io.sockets.in(info.index).emit("getRoomInfo", app.nowRooms[info.index]);
 }
 
 exports.pushHand = (socket, io, info) => {
@@ -216,7 +216,7 @@ exports.pushHand = (socket, io, info) => {
       var second = eval(app.nowRooms[info.roomNum].playersHand[1]);
 
       if (first == second){
-        io.sockets.in(app.nowRooms[info.roomNum].hostName).emit("result", -1);
+        io.sockets.in(info.roomNum).emit("result", -1);
         app.nowRooms[info.roomNum].playersHand = [0, 0];
         return;
       }
