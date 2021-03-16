@@ -42,7 +42,7 @@ exports.joinRoom = (socket, io, info) => {
   }
   if (checkPlayer(info, socket) && checkHost(info)){
     socket.join(info.index);
-    io.sockets.in(app.nowRooms[info.index].hostName).emit("refresh", app.nowRooms[info.index].gameInfo);
+    io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
   }
   else {
     console.log("잘못된 접근 : " + socket.handshake.session);
