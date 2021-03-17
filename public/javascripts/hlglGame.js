@@ -14,29 +14,42 @@ holdOutCardSound.volume = 0.6;
 // 게임 정보에 맞게 렌더링
 var render = (gameInfo) => {
 
-    var playerPos = gameInfo.players.indexOf(player);
+    var playerPos = 0;
+
+    for (var i = 0; i < gameInfo.players.length; i++) {
+        if (gameInfo.players[i].name == player) {
+            playerPos = i;
+            break;
+        }
+    }
 
     // player render
     $("#gameDiv").html("");
     for (var i = playerPos; i < gameInfo.players.length; i++){
-        var tmp = "<div class=\"player\">" + gameInfo.players[i] + " : " + gameInfo.playerSurfaceCard[i].fruit + ", " + gameInfo.playerSurfaceCard[i].num + "</div>"
+        var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>"
         //console.log(gameInfo.players[i]);
         $("#gameDiv").append(tmp);
     }
     for (var i = 0; i < playerPos; i++){
-        var tmp = "<div class=\"player\">" + gameInfo.players[i] + " : " + gameInfo.playerSurfaceCard[i].fruit + ", " + gameInfo.playerSurfaceCard[i].num + "</div>";
+        var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>";
         //console.log(gameInfo.players[i]);
         $("#gameDiv").append(tmp);
     }
     
     // player stat render
-    $("#playerStat").html("나의 남은 카드 : " + gameInfo.playerLeftCards[playerPos]);
+    if (gameInfo.players[playerPos].available) { 
+        $("#playerStat").html("나의 남은 카드 : " + gameInfo.players[playerPos].leftCards);
+    }
+    else {
+        $("#playerStat").html("남은 카드가 없습니다.");
+    }
     // nowTurn render
-    $("#nowTurn").html("현재 차례 : " + gameInfo.players[gameInfo.nowTurn]);
-    //
+    $("#nowTurn").html("현재 차례 : " + gameInfo.players[gameInfo.nowTurn].name);
+    // hostFunc render
     if (hostName == player && gameInfo.nowState == 0) {
         $("#hostFunc").css("display", "block");
     }
+
 };
 
 // click event

@@ -4,12 +4,20 @@ const { test } = require("../socketApp");
 var router = express.Router();
 
 var createNewPlayer = (index, playerId) => {
+  var newPlayer = {
+    name : playerId,
+    available : true,
+    surfaceCard : {fruit : 1, num : 0},
+    leftCards : 0
+  };
+
   app.nowRooms[index].players.push(playerId);
-  app.nowRooms[index].gameInfo.players.push(playerId);
+  app.nowRooms[index].gameInfo.players.push(newPlayer);
+  //app.nowRooms[index].gameInfo.playerAvailable.push(true);
   app.nowRooms[index].playerDeck.push([]);
   app.nowRooms[index].holdOutDeck.push([]);
-  app.nowRooms[index].gameInfo.playerSurfaceCard.push({fruit: 1, num: 0});
-  app.nowRooms[index].gameInfo.playerLeftCards.push(0);
+  //app.nowRooms[index].gameInfo.playerSurfaceCard.push({fruit: 1, num: 0});
+  //app.nowRooms[index].gameInfo.playerLeftCards.push(0);
   app.nowRooms[index].NOW_PLAYER++;
 }
 
@@ -111,10 +119,11 @@ router.post("/makeRoom", (req, res, next) => {
   var gameInfo = {
     nowState : 0, // 현재 게임 상태   0: 대기, 1: 플레이, 2: 일시정지(카드 분배 등), 3: 종료(결과창)
     nowTurn : 0,  // 현재 턴 
-    players : [req.body.hostName], // 현재 플레이어 
+    players : [], // 현재 플레이어 
+    //playerAvailable : [true],      // 플레이어가 현재 유효한지
     time : 0,               // 남은 시간
-    playerSurfaceCard : [newCard], // 현재 플레이어가 내민 카드
-    playerLeftCards : [0],   // 현재 플레이어의 남은 카드 수
+    //playerSurfaceCard : [newCard], // 현재 플레이어가 내민 카드
+    //playerLeftCards : [0],   // 현재 플레이어의 남은 카드 수
   }
 
   // 서버에 남을 정보
@@ -124,12 +133,12 @@ router.post("/makeRoom", (req, res, next) => {
     isLocked : false,
     isPlaying : false,        
     gameMode : 0,
-    players : [req.body.hostName],
+    players : [],
     surfaceCardsSum : [0, 0, 0, 0],   // 내민 카드 중 표면들의 총 합
-    holdOutDeck : [[]],               // 내밀어서 쌓인 카드들
-    playerDeck : [[]],                // 플레이어에게 남은 카드
+    holdOutDeck : [],               // 내밀어서 쌓인 카드들
+    playerDeck : [],                // 플레이어에게 남은 카드
     MAX_PLAYER : 5,
-    NOW_PLAYER : 1, 
+    NOW_PLAYER : 0, 
     gameInfo : gameInfo  
   }
 
@@ -166,6 +175,7 @@ router.post("/makeRoom", (req, res, next) => {
     app.nowRooms[index] = newRoom;
     app.nowPwds[index] = pwd;
     req.session.user.room = index;
+    createNewPlayer(index, req.body.hostName);
     res.redirect("../game/play/" + index);
   }
   else {
