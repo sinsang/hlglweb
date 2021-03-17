@@ -112,6 +112,7 @@ router.post("/makeRoom", (req, res, next) => {
     nowState : 0, // 현재 게임 상태   0: 대기, 1: 플레이, 2: 일시정지(카드 분배 등), 3: 종료(결과창)
     nowTurn : 0,  // 현재 턴 
     players : [req.body.hostName], // 현재 플레이어 
+    
     time : 0,               // 남은 시간
     playerSurfaceCard : [newCard], // 현재 플레이어가 내민 카드
     playerLeftCards : [0],   // 현재 플레이어의 남은 카드 수

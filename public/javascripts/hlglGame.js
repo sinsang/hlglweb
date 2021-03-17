@@ -48,7 +48,7 @@ $("#gameStart").click((e) => {
 
 // from Server
 socket.on("notice", (text) => {
-    console.log(text);
+    //console.log(text);
     $("#notice").html(text);
 });
 
