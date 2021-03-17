@@ -54,6 +54,9 @@ exports.hitBell = (socket, io, info) => {
     return;
   }
   if (checkPlayer(info, socket) && checkHost(info)){
+
+    io.sockets.in(info.index).emit("ring"); // bell sound
+    
     if (app.nowRooms[info.index].gameInfo.nowState != 1){
       socket.emit("notice", "현재는 대기 중입니다.");
     }
@@ -129,6 +132,9 @@ exports.holdOutCard = (socket, io, info) => {
   }
   if (checkPlayer(info, socket) && checkHost(info)){
     var playerIndex = app.nowRooms[info.index].gameInfo.players.indexOf(info.playerId);
+    
+    io.sockets.in(info.index).emit("cardSound");  // card sound
+    
     if (app.nowRooms[info.index].gameInfo.nowState != 1){
       socket.emit("notice", "현재는 대기 중입니다.");
     }

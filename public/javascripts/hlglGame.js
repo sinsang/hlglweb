@@ -2,23 +2,30 @@ var socket = io();
 
 var game = {};
 var info = {index : roomNum, hostName : hostName, playerId : player};
-  
+
+var hitBellSound = new Audio("../../sounds/hitBell.mp3");
+hitBellSound.loop = false;
+hitBellSound.volume = 0.6;
+
+var holdOutCardSound = new Audio("../../sounds/holdOutCard.mp3");
+holdOutCardSound.loop = false;
+holdOutCardSound.volume = 0.6;
 
 // 게임 정보에 맞게 렌더링
 var render = (gameInfo) => {
 
     var playerPos = gameInfo.players.indexOf(player);
-    
+
     // player render
     $("#gameDiv").html("");
     for (var i = playerPos; i < gameInfo.players.length; i++){
         var tmp = "<div class=\"player\">" + gameInfo.players[i] + " : " + gameInfo.playerSurfaceCard[i].fruit + ", " + gameInfo.playerSurfaceCard[i].num + "</div>"
-        console.log(gameInfo.players[i]);
+        //console.log(gameInfo.players[i]);
         $("#gameDiv").append(tmp);
     }
     for (var i = 0; i < playerPos; i++){
         var tmp = "<div class=\"player\">" + gameInfo.players[i] + " : " + gameInfo.playerSurfaceCard[i].fruit + ", " + gameInfo.playerSurfaceCard[i].num + "</div>";
-        console.log(gameInfo.players[i]);
+        //console.log(gameInfo.players[i]);
         $("#gameDiv").append(tmp);
     }
     
@@ -55,6 +62,16 @@ socket.on("notice", (text) => {
 socket.on("refresh", (gameInfo) => {
     game = gameInfo;
     render(game);
+});
+
+socket.on("ring", () => {
+    hitBellSound.load();
+    hitBellSound.play();
+});
+
+socket.on("cardSound", () => {
+    holdOutCardSound.load();
+    holdOutCardSound.play();
 });
 
 socket.on("getRoomInfo", (roomInfo) => {
