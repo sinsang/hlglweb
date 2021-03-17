@@ -104,8 +104,8 @@ exports.hitBell = (socket, io, info) => {
         }
         else if (i != penaltyIndex) {
           app.nowRooms[info.index].playerDeck[i].push(app.nowRooms[info.index].playerDeck[penaltyIndex].pop());
-          app.nowRooms[info.index].gameInfo.playerLeftCards[i] = app.nowRooms[info.index].playerDeck[i].length;
         }   
+        app.nowRooms[info.index].gameInfo.playerLeftCards[i] = app.nowRooms[info.index].playerDeck[i].length;
       }
 
       app.nowRooms[info.index].gameInfo.nowState = 2;   // 카드 분배 중 일시정지
