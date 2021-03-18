@@ -130,6 +130,8 @@ exports.GAME = class game {
             return 1;
         }
         if (this.gameInfo.nowTurn != playerIndex) {     // 잘못된 차례
+            console.log("nowTurn : " + this.gameInfo.nowTurn);
+            console.log("player : " + playerIndex);
             return 2;
         }
         if (this.playerDeck[playerIndex].length < 1){   // 덱이 빔
