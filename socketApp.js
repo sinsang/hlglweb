@@ -62,7 +62,7 @@ exports.hitBell = (socket, io, info) => {
     switch (app.nowRooms[info.index].hitBell(info.player)) {
       case 1: // 대기
         socket.emit("notice", "현재는 대기 중입니다.");
-        return;
+        break;
         
       case 2: // 승리
         io.sockets.in(info.index).emit("notice", info.playerId + "님이 이겼습니다. 카드를 가져가는 중..");
@@ -107,13 +107,13 @@ exports.holdOutCard = (socket, io, info) => {
     switch (app.nowRooms[info.index].holdOutCard()) {
         case 1: // 대기
           socket.emit("notice", "현재는 대기 중입니다.");
-          return;
+          break;
         case 2: // 잘못된 차례
           socket.emit("notice", "현재 당신의 차례가 아닙니다.");
-          return;
+          break;
         case 3: // 덱이 비어있음
           socket.emit("notice", "현재 당신의 덱이 비어있습니다.");
-          return; 
+          break; 
 
         case 4: // 카드 소진
           io.sockets.in(info.index).emit("cardSound");  // card sound
