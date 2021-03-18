@@ -65,7 +65,7 @@ exports.GAME = class game {
     // 이름으로 인덱스 얻기
     getPlayerIndex = (player) => {
         for (var i = 0; i < this.players.length; i++) {
-            if (this.players[i].name === player) {
+            if (this.players[i] === player) {
                 return i;
             }
         }
