@@ -1,4 +1,5 @@
 const e = require("express");
+const { io } = require("./app");
 var app = require("./app");
 
 var checkPlayer = (info, socket) => {
@@ -50,83 +51,44 @@ exports.joinRoom = (socket, io, info) => {
 };
 
 exports.hitBell = (socket, io, info) => {
+
   if (isEmpty(app.nowRooms[info.index])){
     return;
   }
   if (checkPlayer(info, socket) && checkHost(info)){
 
     io.sockets.in(info.index).emit("ring"); // bell sound
-    
-    if (app.nowRooms[info.index].gameInfo.nowState != 1){
-      socket.emit("notice", "현재는 대기 중입니다.");
-    }
-    else if (app.nowRooms[info.index].surfaceCardsSum.indexOf(5) != -1) { // 승리
-      var winnerIndex = 0;
-      for (var i = 0; i < app.nowRooms[info.index].players.length; i++) {
-          if (app.nowRooms[info.index].players[i].name == info.playerId) {
-              winnerIndex = i;
-              break;
-          }
-      }
-      
-      io.sockets.in(info.index).emit("notice", info.playerId + "님이 이겼습니다. 카드를 가져가는 중..");
-      
-      // 내민 카드 정보 정리
-      app.nowRooms[info.index].surfaceCardsSum = [0,0,0,0];
-      for (var i = 0; i < app.nowRooms[info.index].NOW_PLAYER; i++){
-        app.nowRooms[info.index].gameInfo.players[i].surfaceCard = {fruit : 1, num : 0};   
-      }
 
-      // 내민 카드들 승자에게
-      for (var i = 0; i < app.nowRooms[info.index].NOW_PLAYER; i++){
-        var len = app.nowRooms[info.index].holdOutDeck[i].length;
-        for (var j = 0; j < len; j++){
-          app.nowRooms[info.index].playerDeck[winnerIndex].push(app.nowRooms[info.index].holdOutDeck[i].pop());
-        }   
-      }
-      
-      // 게임 정보 업데이트
-      app.nowRooms[info.index].gameInfo.players[winnerIndex].leftCards = app.nowRooms[info.index].playerDeck[winnerIndex].length;
-      app.nowRooms[info.index].gameInfo.nowState = 2;   // 카드 분배 중 일시정지                                       
-      app.nowRooms[info.index].gameInfo.nowTurn = winnerIndex;     // 이긴 사람부터 다시시작
-      io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
-
-      // 2초 후 재시작
-      setTimeout(()=>{
-        app.nowRooms[info.index].gameInfo.nowState = 1;
-        io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+    switch (app.nowRooms[info.index].hitBell(info.player)) {
+      case 1: // 대기
+        socket.emit("notice", "현재는 대기 중입니다.");
+        return;
+        
+      case 2: // 승리
+        io.sockets.in(info.index).emit("notice", info.playerId + "님이 이겼습니다. 카드를 가져가는 중..");
         io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
-      }, 2000);
-    }
-    else {  // 벌칙
-      var penaltyIndex = 0;
-      for (var i = 0; i < app.nowRooms[info.index].players.length; i++) {
-          if (app.nowRooms[info.index].players[i].name == info.playerId) {
-              penaltyIndex = i;
-              break;
-          }
-      }      
 
-      io.sockets.in(info.index).emit("notice", info.playerId + "님이 잘못 종을 쳤습니다. 벌칙으로 카드를 나눠 주는 중..");
-      for (var i = 0; i < app.nowRooms[info.index].NOW_PLAYER; i++){
-        if (app.nowRooms[info.index].playerDeck[penaltyIndex].length < 1) {
-          // 카드가 비게 되면 중단, 벌칙받은 플레이어는 패배  
-          break;
-        }
-        else if (i != penaltyIndex) {
-          app.nowRooms[info.index].playerDeck[i].push(app.nowRooms[info.index].playerDeck[penaltyIndex].pop());
-        }   
-        app.nowRooms[info.index].gameInfo.players[i].leftCards = app.nowRooms[info.index].playerDeck[i].length;
-      }
-
-      app.nowRooms[info.index].gameInfo.nowState = 2;   // 카드 분배 중 일시정지
-      io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
-
-      setTimeout(()=>{
-        app.nowRooms[info.index].gameInfo.nowState = 1;
-        io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+        setTimeout(() => {  // 2초 후 재시작
+          app.nowRooms[info.index].restart();
+          io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+          io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
+        }, 2000);
+        break;
+      
+      case 3: // 벌칙
+        io.sockets.in(info.index).emit("notice", info.playerId + "님이 잘못 종을 쳤습니다. 벌칙으로 카드를 나눠 주는 중..");
         io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
-      }, 2000);
+
+        setTimeout(() => {  // 2초 후 재시작
+          app.nowRooms[info.index].restart();
+          io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+          io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
+        }, 2000);
+        break;
+    }  
+
+    if (app.nowRooms[info.index].isGameSet()){
+      io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
     }
   }
   else {
@@ -134,58 +96,41 @@ exports.hitBell = (socket, io, info) => {
   }
 };
 
-
 exports.holdOutCard = (socket, io, info) => {
   
   if (isEmpty(app.nowRooms[info.index])){
     return;
   }
-  
+
   if (checkPlayer(info, socket) && checkHost(info)){
-    var playerIndex = 0;
-    for (var i = 0; i < app.nowRooms[info.index].players.length; i++) {
-        if (app.nowRooms[info.index].players[i].name == info.playerId) {
-            playerIndex = i;
-            break;
-        }
-    }
     
-    io.sockets.in(info.index).emit("cardSound");  // card sound
-    
-    if (app.nowRooms[info.index].gameInfo.nowState != 1){
-      socket.emit("notice", "현재는 대기 중입니다.");
-    }
-    else if (app.nowRooms[info.index].gameInfo.nowTurn != playerIndex){
-      socket.emit("notice", "현재 당신의 차례가 아닙니다.");
-    }
-    else if (app.nowRooms[info.index].playerDeck[playerIndex].length < 1){
-      socket.emit("notice", "현재 당신의 덱이 비어있습니다.");
+    switch (app.nowRooms[info.index].holdOutCard()) {
+        case 1: // 대기
+          socket.emit("notice", "현재는 대기 중입니다.");
+          return;
+        case 2: // 잘못된 차례
+          socket.emit("notice", "현재 당신의 차례가 아닙니다.");
+          return;
+        case 3: // 덱이 비어있음
+          socket.emit("notice", "현재 당신의 덱이 비어있습니다.");
+          return; 
 
-      // 다음순서로 조정
-      app.nowRooms[info.index].gameInfo.nowTurn++;
-      app.nowRooms[info.index].gameInfo.nowTurn %= app.nowRooms[info.index].NOW_PLAYER; 
-    }
-    else {
+        case 4: // 카드 소진
+          io.sockets.in(info.index).emit("cardSound");  // card sound
+          io.sockets.in(info.index).emit("notice", info.playerId + "님이 카드를 냈습니다.");
+          io.sockets.in(info.index).emit("notice", info.playerId + "님이 카드를 모두 소진했습니다.");
+          break;
 
-      // 카드 내밀기
-      var getCard = app.nowRooms[info.index].playerDeck[playerIndex].pop();      
-      app.nowRooms[info.index].holdOutDeck[playerIndex].push(getCard);
-
-      app.nowRooms[info.index].surfaceCardsSum[app.nowRooms[info.index].gameInfo.players[playerIndex].surfaceCard.fruit - 1] -= app.nowRooms[info.index].gameInfo.players[playerIndex].surfaceCard.num
-      app.nowRooms[info.index].gameInfo.players[playerIndex].surfaceCard = getCard;
-      app.nowRooms[info.index].surfaceCardsSum[getCard.fruit - 1] += getCard.num;
-
-      app.nowRooms[info.index].gameInfo.players[playerIndex].leftCards--;
-
-      // 다음순서로 조정
-      app.nowRooms[info.index].gameInfo.nowTurn++;
-      app.nowRooms[info.index].gameInfo.nowTurn %= app.nowRooms[info.index].NOW_PLAYER; 
-
-      // 클라이언트로 정보 전달
-      io.sockets.in(info.index).emit("notice", info.playerId + "님이 카드를 냈습니다.");
+        case 5: // 정상 처리
+          io.sockets.in(info.index).emit("cardSound");  // card sound
+          io.sockets.in(info.index).emit("notice", info.playerId + "님이 카드를 냈습니다.");  
+          break;
+      }
       io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
-    
-    }
+      
+      if (app.nowRooms[info.index].isGameSet()){
+        io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
+      }
   }
   else {
     console.log("잘못된 접근 : " + socket.handshake.session);
@@ -198,22 +143,8 @@ exports.gameStart = (socket, io, info) => {
     return;
   }
   if (isHost(info, socket)){
-    var newDeck = createNewDeck();
     
-    for (var i = 0; i < 10; i++) shuffle(newDeck);
-    
-    var cardPerPlayer = parseInt(newDeck.length / app.nowRooms[info.index].NOW_PLAYER);
-
-    for (var i = 0; i < app.nowRooms[info.index].players.length; i++){
-      for (var j = 0; j < cardPerPlayer; j++){
-        app.nowRooms[info.index].playerDeck[i].push(newDeck.pop());
-      }
-      app.nowRooms[info.index].gameInfo.players[i].leftCards = app.nowRooms[info.index].playerDeck[i].length;
-      app.nowRooms[info.index].gameInfo.nowTurn = 0;
-    }
-
-    app.nowRooms[info.index].isPlaying = true;
-    app.nowRooms[info.index].gameInfo.nowState = 1;
+    app.nowRooms[info.index].gameStart();
 
     io.sockets.in(info.index).emit("notice", "게임이 시작되었습니다.");
     io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
@@ -245,22 +176,21 @@ exports.disconnect = (socket, io) => {
     var index = app.nowRooms[room].players.indexOf(player);
     console.log(player + "님이 " + hostName + "의 방에서 나감 ");
     
+    // 방에서 플레이어 정보 제거
     app.nowRooms[room].players.splice(index, 1);
     app.nowRooms[room].holdOutDeck.splice(index, 1);
     app.nowRooms[room].playerDeck.splice(index, 1);
     
     app.nowRooms[room].gameInfo.players.splice(index, 1);
-    //app.nowRooms[room].gameInfo.players.surfaceCard.splice(index, 1);
-    //app.nowRooms[room].gameInfo.players.leftCards.splice(index, 1);
-    //app.nowRooms[room].gameInfo.playerAvailable.splice(index, 1);
-
     app.nowRooms[room].NOW_PLAYER--;
 
+    // 현재 차례인 사람이 나갔을 시 
     if (app.nowRooms[room].gameInfo.nowTurn == index){
       app.nowRooms[room].gameInfo.nowTurn++;
       app.nowRooms[room].gameInfo.nowTurn %= app.nowRooms[room].NOW_PLAYER;
     }
 
+    // 나간 사람이 호스트 일 시 호스트 권한 이동
     if (isHost({index : room, playerId : player, hostName : hostName}, socket) && app.nowRooms[room].NOW_PLAYER > 0) {
       app.nowRooms[room].hostName = app.nowRooms[room].players[app.nowRooms[room].gameInfo.nowTurn];
       app.nowPwds[room].hostName = app.nowRooms[room].players[app.nowRooms[room].gameInfo.nowTurn];
@@ -273,6 +203,10 @@ exports.disconnect = (socket, io) => {
     }
     else {
       io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
+
+      if (app.nowRooms[info.index].isGameSet()){
+        io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
+      }
     }
 
   }

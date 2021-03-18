@@ -69,7 +69,7 @@ $("#gameStart").click((e) => {
 // from Server
 socket.on("notice", (text) => {
     //console.log(text);
-    $("#notice").html(text);
+    $("#notice").html(text + "<br/>" + $("#notice").html());
 });
 
 socket.on("refresh", (gameInfo) => {

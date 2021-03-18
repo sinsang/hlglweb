@@ -1,4 +1,5 @@
 var app = require("../app");
+var gameClass = require("../gameClass");
 var express = require('express');
 const { test } = require("../socketApp");
 var router = express.Router();
@@ -120,10 +121,7 @@ router.post("/makeRoom", (req, res, next) => {
     nowState : 0, // 현재 게임 상태   0: 대기, 1: 플레이, 2: 일시정지(카드 분배 등), 3: 종료(결과창)
     nowTurn : 0,  // 현재 턴 
     players : [], // 현재 플레이어 
-    //playerAvailable : [true],      // 플레이어가 현재 유효한지
-    time : 0,               // 남은 시간
-    //playerSurfaceCard : [newCard], // 현재 플레이어가 내민 카드
-    //playerLeftCards : [0],   // 현재 플레이어의 남은 카드 수
+    time : 0,     // 남은 시간
   }
 
   // 서버에 남을 정보
@@ -172,10 +170,12 @@ router.post("/makeRoom", (req, res, next) => {
   }
 
   if (index > -1){
-    app.nowRooms[index] = newRoom;
+    app.nowRooms[index] = new gameClass.GAME(index, req.body.hostName);
+    //app.nowRooms[index] = newRoom;
     app.nowPwds[index] = pwd;
     req.session.user.room = index;
-    createNewPlayer(index, req.body.hostName);
+    app.nowRooms[index].createNewPlayer(req.body.hostName);
+    console.log(app.nowRooms[index]);
     res.redirect("../game/play/" + index);
   }
   else {
@@ -198,7 +198,7 @@ router.post("/enterRoom", (req, res, next) => {
       return;
     }
     else if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd) {
-      createNewPlayer(index, playerId);
+      app.nowRooms[index].createNewPlayer(playerId);
       req.session.user.room = index;
       res.send({result : true});
       return;
