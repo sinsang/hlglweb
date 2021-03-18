@@ -59,7 +59,7 @@ exports.hitBell = (socket, io, info) => {
 
     io.sockets.in(info.index).emit("ring"); // bell sound
 
-    switch (app.nowRooms[info.index].hitBell(info.player)) {
+    switch (app.nowRooms[info.index].hitBell(info.playerId)) {
       case 1: // 대기
         socket.emit("notice", "현재는 대기 중입니다.");
         break;
@@ -104,7 +104,7 @@ exports.holdOutCard = (socket, io, info) => {
 
   if (checkPlayer(info, socket) && checkHost(info)){
     
-    switch (app.nowRooms[info.index].holdOutCard()) {
+    switch (app.nowRooms[info.index].holdOutCard(info.playerId)) {
         case 1: // 대기
           socket.emit("notice", "현재는 대기 중입니다.");
           break;
