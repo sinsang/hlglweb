@@ -109,8 +109,8 @@ exports.GAME = class game {
         this.gameInfo.nowState = 3;
 
         result.sort((a, b) => {
-            if (a.leftCards > b.leftCards) return 1;
-            if (a.leftCards < b.leftCards) return -1;
+            if (a.leftCards > b.leftCards) return -1;
+            if (a.leftCards < b.leftCards) return 1;
             return 0;
         });
 
@@ -176,6 +176,7 @@ exports.GAME = class game {
                 for (var j = 0; j < len; j++){
                     this.playerDeck[winnerIndex].push(this.holdOutDeck[i].pop());
                 }
+                this.gameInfo.players[i].surfaceCard = {fruit: 1, num: 0};
             }
 
             // 내민 카드들 승자에게
