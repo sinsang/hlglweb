@@ -26,32 +26,26 @@ var render = (gameInfo) => {
     // playerCard render
     $("#anotherPlayersDiv").html("");
     for (var i = playerPos + 1; i < gameInfo.players.length; i++){
-        //var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>"
-        //console.log(gameInfo.players[i]);
-        //$("#gameDiv").append(tmp);
+        var tmp = "<div class=\"another\">" + gameInfo.players[i].name + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
-            var tmp = "<div>" + gameInfo.players[i].name + "<br/>";
-            tmp += "<div class=\"another card\">";
+            tmp += "<div class=\"card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
             tmp += "</div></div>";
         }
         else {
-            var tmp = "<div class=\"another card\" style=\"background-color: red;\"></div>";
+            tmp += "<div class=\"another card\" style=\"background-color: red;\"></div></div>";
         }
         $("#anotherPlayersDiv").append(tmp);
     }
     for (var i = 0; i < playerPos; i++){
-        //var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>";
-        //console.log(gameInfo.players[i]);
-        //$("#gameDiv").append(tmp);
+        var tmp = "<div class=\"another\">" + gameInfo.players[i].name + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
-            var tmp = "<div>" + gameInfo.players[i].name + "<br/>";
-            tmp += "<div class=\"another card\">";
+            tmp += "<div class=\"card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
             tmp += "</div></div>";
         }
         else {
-            var tmp = "<div class=\"another card\" style=\"background-color: red;\"></div>";
+            tmp += "<div class=\"another card\" style=\"background-color: red;\"></div></div>";
         }
         $("#anotherPlayersDiv").append(tmp);
     }
