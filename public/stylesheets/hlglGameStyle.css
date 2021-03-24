@@ -121,6 +121,11 @@ section {
     text-align: center;
 }
 
+#anotherPlayersDiv * {
+    display: inline-block;
+    margin-right: 10px;
+}
+
 #notice {
     width: 500px;
     height: 200px;
