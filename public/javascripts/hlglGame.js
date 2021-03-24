@@ -56,8 +56,11 @@ var render = (gameInfo) => {
 
     if (gameInfo.players[playerPos].surfaceCard.num > 0){
         var tmp = "<img src=\"../../images/" + gameInfo.players[playerPos].surfaceCard.fruit + "_" + gameInfo.players[playerPos].surfaceCard.num + ".png\" />";
-        $("#myHoldOutCard").html(tmp);
     }
+    else {
+        var tmp = "<div class=\"card\" id=\"myHoldOutCard\" style=\"background-color: red;\"></div>";
+    }
+    $("#myHoldOutCard").html(tmp);
 
     // player stat render
     if (gameInfo.players[playerPos].available) { 
