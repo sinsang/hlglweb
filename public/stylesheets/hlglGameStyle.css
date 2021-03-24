@@ -1,7 +1,141 @@
+html {
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+/* header */
+header {
+    width: 100%;
+    height: 10%;
+}
+
+.hamburger {
+    position: absolute;
+    z-index: 1;
+    display: block;
+}
+
+#menu {
+    position: absolute;
+    
+    width: 150px;
+    height: 90%;
+    padding: 10px;
+
+    z-index: 1;
+    font-size: 20px;
+
+    background-color: blue;
+    display: none;
+}
+
+#menu button {
+    margin-top: 7px;
+}
+
+#headTitle {
+    height: 100%;
+    width: 100%;
+
+    display: table;
+
+    text-align: center;
+}
+
+#headTitle h2 {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/* game section */
+section {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 85%;
+
+    padding-bottom: 3px;
+
+    background-color: darkgrey;
+}
+
+#bellDiv {
+    position: absolute;
+
+    width: 100%;
+    text-align: center;
+}
+
+#bell {
+    display: inline-block;
+}
+
+#myDiv {
+    position: absolute;
+    width: 100%;
+    height: 33%;
+    text-align: center;
+}
+
+#myDiv * {
+    display: inline-block;
+}
+
+.deck {
+    width: 50px;
+    height: 79px;
+}
+
+.deck img {
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    width: 80px;
+    height: 126px;
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+}
+
+.another {
+    transform: rotate(180);
+}
+
+#anotherPlayersDiv {
+    position: absolute;
+    width: 100%;
+    height: 33%;
+    text-align: center;
+}
+
 #notice {
     width: 500px;
     height: 200px;
     border: 0.5px solid black;
     overflow-x: hidden;
     overflow-y: scroll;
+    
+    display: none;
+}
+
+/* footer */
+footer {
+    width: 100%;
+    height: 5%;
+
+    font-size: 8px;
+    text-align: center;
 }

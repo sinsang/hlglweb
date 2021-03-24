@@ -62,7 +62,7 @@ exports.hitBell = (socket, io, info) => {
     switch (app.nowRooms[info.index].hitBell(info.playerId)) {
       case 1: // 대기
         socket.emit("notice", "현재는 대기 중입니다.");
-        break;
+        return;
         
       case 2: // 승리
         io.sockets.in(info.index).emit("notice", info.playerId + "님이 이겼습니다. 카드를 가져가는 중..");
@@ -89,6 +89,7 @@ exports.hitBell = (socket, io, info) => {
 
     if (app.nowRooms[info.index].isGameSet()){
       io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
+      io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
     }
   }
   else {
@@ -107,13 +108,13 @@ exports.holdOutCard = (socket, io, info) => {
     switch (app.nowRooms[info.index].holdOutCard(info.playerId)) {
         case 1: // 대기
           socket.emit("notice", "현재는 대기 중입니다.");
-          break;
+          return;
         case 2: // 잘못된 차례
           socket.emit("notice", "현재 당신의 차례가 아닙니다.");
-          break;
+          return;
         case 3: // 덱이 비어있음
           socket.emit("notice", "현재 당신의 덱이 비어있습니다.");
-          break; 
+          return; 
 
         case 4: // 카드 소진
           io.sockets.in(info.index).emit("cardSound");  // card sound
@@ -126,10 +127,12 @@ exports.holdOutCard = (socket, io, info) => {
           io.sockets.in(info.index).emit("notice", info.playerId + "님이 카드를 냈습니다.");  
           break;
       }
+
       io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
       
       if (app.nowRooms[info.index].isGameSet()){
         io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
+        io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
       }
   }
   else {

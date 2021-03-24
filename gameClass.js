@@ -47,6 +47,7 @@ exports.GAME = class game {
         this.NOW_PLAYER = 0; 
     }
     
+    // 새 플레이어 생성
     createNewPlayer = (name) => {
         var newPlayer = {
             name : name,
@@ -81,6 +82,7 @@ exports.GAME = class game {
         var cardPerPlayer = parseInt(newDeck.length / this.NOW_PLAYER);
 
         for (var i = 0; i < this.players.length; i++){
+            this.playerDeck[i] = [];
             for (var j = 0; j < cardPerPlayer; j++){
                 this.playerDeck[i].push(newDeck.pop());
             }
@@ -104,9 +106,9 @@ exports.GAME = class game {
 
     // 게임종료, 결과 출력
     gameSet = () => {
-        var result = this.gameInfo.players.splice(0);
+        var result = this.gameInfo.players.slice();
 
-        this.gameInfo.nowState = 3;
+        this.gameInfo.nowState = 0;
 
         result.sort((a, b) => {
             if (a.leftCards > b.leftCards) return -1;
@@ -130,8 +132,8 @@ exports.GAME = class game {
             return 1;
         }
         if (this.gameInfo.nowTurn != playerIndex) {     // 잘못된 차례
-            console.log("nowTurn : " + this.gameInfo.nowTurn);
-            console.log("player : " + playerIndex);
+            //console.log("nowTurn : " + this.gameInfo.nowTurn);
+            //console.log("player : " + playerIndex);
             return 2;
         }
         if (this.playerDeck[playerIndex].length < 1){   // 덱이 빔

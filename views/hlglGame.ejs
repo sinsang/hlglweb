@@ -1,22 +1,59 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title><%= hostName %>님의 할리갈리 방 </title>
+        <title><%= hostName %>님의 할리갈리 방</title>
     </head>
     <link href="../../stylesheets/hlglGameStyle.css" rel="stylesheet" type="text/css" />
+    <link href="../../stylesheets/hamburgers-master/dist/hamburgers.css" rel="stylesheet" type="text/css" />
     <body>
-        <div id="gameDiv"></div>
-        <button id="bell" style="width: 100px; height: 100px;">종</button>
-        <button id="myDeck" style="width: 50px; height: 50px;">내 덱</button>
-        <div id="playerStat"></div>
-        <div id="nowTurn"></div>
-        <div id="notice"></div>
-        <div id="hostFunc" style="display: none;">
-            <button id="gameStart">게임시작</button>
-        </div>
-        <div id="normalFunc">
-            <button id="exit">나가기</button>
-        </div>
+        <header>
+            <button class="hamburger hamburger--squeeze" type="button">  
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span> 
+            </button>
+            <div id="menu">
+                <%= player.name %>
+                <div id="hostFunc" style="display: none;">
+                    <button id="gameStart">게임시작</button>
+                </div>
+                <div id="normalFunc">
+                    <button id="exit">나가기</button>
+                    <button id="playerInfo">플레이어 정보</button>
+                </div>
+            </div>
+            <div id="headTitle">
+                <h2><%= hostName %>님의 할리갈리</h2>
+            </div>
+        </header>
+
+        <section>
+            <div id="anotherPlayersDiv">
+                
+            </div>
+
+            <div id="bellDiv">
+                <button id="bell" style="width: 100px; height: 100px;">종</button>
+            </div>
+
+            <div id="myDiv">
+                <div class="card" id="myHoldOutCard" style="background-color: red;">
+                </div>
+                <br/>
+                <div class="deck" id="myDeck">
+                    <img id="myCard" src="../../images/deck.png"/>
+                </div>
+                <br/>
+                <div id="playerStat"></div><br/><div id="nowTurn"></div>
+            </div>
+
+            <div id="notice"></div>
+        </section>
+
+        <footer>
+            Copyright 2021. 신상우 all rights reserved.<br/>
+            sw980321@naver.com
+        </footer>
     </body>
     <script>
         var roomNum = <%= roomNum %>;

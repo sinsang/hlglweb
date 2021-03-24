@@ -23,19 +23,42 @@ var render = (gameInfo) => {
         }
     }
 
-    // player render
-    $("#gameDiv").html("");
-    for (var i = playerPos; i < gameInfo.players.length; i++){
-        var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>"
+    // playerCard render
+    $("#anotherPlayersDiv").html("");
+    for (var i = playerPos + 1; i < gameInfo.players.length; i++){
+        //var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>"
         //console.log(gameInfo.players[i]);
-        $("#gameDiv").append(tmp);
+        //$("#gameDiv").append(tmp);
+        if (gameInfo.players[i].surfaceCard.num > 0){
+            var tmp = "<div class=\"another card\">";
+            tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
+            tmp += "</div>";
+        }
+        else {
+            var tmp = "<div class=\"another card\" style=\"background-color: red;\"></div>";
+        }
+        $("#anotherPlayersDiv").append(tmp);
     }
     for (var i = 0; i < playerPos; i++){
-        var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>";
+        //var tmp = "<div class=\"player\">" + gameInfo.players[i].name + " : " + gameInfo.players[i].surfaceCard.fruit + ", " + gameInfo.players[i].surfaceCard.num + "</div>";
         //console.log(gameInfo.players[i]);
-        $("#gameDiv").append(tmp);
+        //$("#gameDiv").append(tmp);
+        if (gameInfo.players[i].surfaceCard.num > 0){
+            var tmp = "<div class=\"another card\">";
+            tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
+            tmp += "</div>";
+        }
+        else {
+            var tmp = "<div class=\"another card\" style=\"background-color: red;\"></div>";
+        }
+        $("#anotherPlayersDiv").append(tmp);
     }
-    
+
+    if (gameInfo.players[playerPos].surfaceCard.num > 0){
+        var tmp = "<img src=\"../../images/" + gameInfo.players[playerPos].surfaceCard.fruit + "_" + gameInfo.players[playerPos].surfaceCard.num + ".png\" />";
+        $("#myHoldOutCard").html(tmp);
+    }
+
     // player stat render
     if (gameInfo.players[playerPos].available) { 
         $("#playerStat").html("나의 남은 카드 : " + gameInfo.players[playerPos].leftCards);
@@ -43,11 +66,23 @@ var render = (gameInfo) => {
     else {
         $("#playerStat").html("남은 카드가 없습니다.");
     }
+
     // nowTurn render
     $("#nowTurn").html("현재 차례 : " + gameInfo.players[gameInfo.nowTurn].name);
+    
     // hostFunc render
-    if (hostName == player && gameInfo.nowState == 0) {
-        $("#hostFunc").css("display", "block");
+    if (hostName == player) {
+        switch (gameInfo.nowState) {
+            case 0: 
+            case 3:
+                $("#hostFunc").css("display", "block");
+                $("#gameStart").css("display", "block");
+                break;
+            case 1:
+            case 2:
+                $("#hostFunc").css("display", "none");
+                break;
+        }
     }
 
 };
@@ -63,7 +98,16 @@ $("#myDeck").click((e) => {
 
 $("#gameStart").click((e) => {
     socket.emit("gameStart", info);
-    $("#hostFunc").css("display", "none");
+    //$("#hostFunc").css("display", "none");
+});
+
+$("#exit").click((e) => {
+    location.href = "../../game/list";
+});
+
+$(".hamburger").click((e) => {
+    document.querySelector(".hamburger").classList.toggle("is-active");
+    $("#menu").slideToggle("fast");
 });
 
 // from Server
@@ -93,3 +137,8 @@ socket.on("getRoomInfo", (roomInfo) => {
 
 // joinRoom
 socket.emit("joinRoom", {index : roomNum, hostName : hostName, playerId : player});
+
+// css 
+$("#menu").css("padding-top", $(".hamburger").css("width"));
+$("#myDiv").css("margin-top", $("#anotherPlayersDiv").css("height").replace("px", "") * 1 + $("#bellDiv").css("height").replace("px", "") * 1 + 5 + "px");
+$("#bellDiv").css("margin-top", $("#anotherPlayersDiv").css("height"));
