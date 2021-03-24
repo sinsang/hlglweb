@@ -26,9 +26,9 @@ var render = (gameInfo) => {
     // playerCard render
     $("#anotherPlayersDiv").html("");
     for (var i = playerPos + 1; i < gameInfo.players.length; i++){
-        var tmp = "<div class=\"another\">" + gameInfo.players[i].name + "<br/>";
+        var tmp = "<div class=\"anotherPlayer\">" + gameInfo.players[i].name + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
-            tmp += "<div class=\"card\">";
+            tmp += "<div class=\"another card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
             tmp += "</div></div>";
         }
@@ -108,6 +108,11 @@ $(".hamburger").click((e) => {
     document.querySelector(".hamburger").classList.toggle("is-active");
     $("#menu").slideToggle("fast");
 });
+
+$("#showLog").click((e) => {
+    $("#notice").toggle();
+    $("#notice").draggable();
+})
 
 // from Server
 socket.on("notice", (text) => {

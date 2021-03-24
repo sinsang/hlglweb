@@ -19,7 +19,7 @@
                 </div>
                 <div id="normalFunc">
                     <button id="exit">나가기</button>
-                    <button id="playerInfo">플레이어 정보</button>
+                    <button id="showLog">게임 로그</button>
                 </div>
             </div>
             <div id="headTitle">
@@ -55,6 +55,7 @@
             sw980321@naver.com
         </footer>
     </body>
+
     <script>
         var roomNum = <%= roomNum %>;
         var hostName = "<%= hostName %>";
@@ -62,5 +63,7 @@
     </script>
     <script src="../../javascripts/jquery-3.6.0.min.js"></script>
     <script src="../../javascripts/socket.io.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="../../javascripts/hlglGame.js"></script>
 </html>

@@ -28,7 +28,7 @@ header {
     position: absolute;
     
     width: 150px;
-    height: 90%;
+    height: 100%;
     padding: 10px;
 
     z-index: 1;
@@ -127,11 +127,15 @@ section {
 }
 
 #notice {
+    position: absolute;
+
     width: 500px;
     height: 200px;
     border: 0.5px solid black;
     overflow-x: hidden;
     overflow-y: scroll;
+
+    background-color: white;
     
     display: none;
 }
