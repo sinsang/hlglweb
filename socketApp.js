@@ -205,11 +205,10 @@ exports.disconnect = (socket, io) => {
       app.nowRooms[room] = {};
     }
     else {
-      io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
-
-      if (app.nowRooms[info.index].isGameSet()){
-        io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
+      if (app.nowRooms[room].isGameSet()){
+        io.sockets.in(room).emit("notice", app.nowRooms[room].gameSet());
       }
+      io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
     }
 
   }

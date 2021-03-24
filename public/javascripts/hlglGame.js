@@ -30,9 +30,10 @@ var render = (gameInfo) => {
         //console.log(gameInfo.players[i]);
         //$("#gameDiv").append(tmp);
         if (gameInfo.players[i].surfaceCard.num > 0){
-            var tmp = "<div class=\"another card\">";
+            var tmp = "<div>" + gameInfo.players[i].name + "<br/>";
+            tmp += "<div class=\"another card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
-            tmp += "</div>";
+            tmp += "</div></div>";
         }
         else {
             var tmp = "<div class=\"another card\" style=\"background-color: red;\"></div>";
@@ -44,9 +45,10 @@ var render = (gameInfo) => {
         //console.log(gameInfo.players[i]);
         //$("#gameDiv").append(tmp);
         if (gameInfo.players[i].surfaceCard.num > 0){
-            var tmp = "<div class=\"another card\">";
+            var tmp = "<div>" + gameInfo.players[i].name + "<br/>";
+            tmp += "<div class=\"another card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
-            tmp += "</div>";
+            tmp += "</div></div>";
         }
         else {
             var tmp = "<div class=\"another card\" style=\"background-color: red;\"></div>";
