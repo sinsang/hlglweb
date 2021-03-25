@@ -22,6 +22,7 @@ var shuffle = (sourceArray) => {
 
 exports.GAME = class game {   
 
+    // 게임 생성
     constructor(index, hostName) {       
         // 클라이언트로 보낼 게임 정보
         this.gameInfo = {
@@ -168,15 +169,20 @@ exports.GAME = class game {
             return 1;
         }
 
+        var playerIndex = this.getPlayerIndex(player);
+
+        if (!this.gameInfo.players[playerIndex].available) {    // 종을 친 플레이어가 생존상태가 아닐 때
+            return 1;
+        }
+        
         if (this.surfaceCardsSum.indexOf(5) != -1) {    // 승리
-            var winnerIndex = this.getPlayerIndex(player);
 
             // 내민 카드 정보 정리
             this.surfaceCardsSum = [0,0,0,0];
             for (var i = 0; i < this.NOW_PLAYER; i++) {
                 var len = this.holdOutDeck[i].length;
                 for (var j = 0; j < len; j++){
-                    this.playerDeck[winnerIndex].push(this.holdOutDeck[i].pop());
+                    this.playerDeck[playerIndex].push(this.holdOutDeck[i].pop());
                 }
                 this.gameInfo.players[i].surfaceCard = {fruit: 1, num: 0};
             }
@@ -185,35 +191,27 @@ exports.GAME = class game {
             for (var i = 0; i < this.NOW_PLAYER; i++){
                 var len = this.holdOutDeck[i].length;
                 for (var j = 0; j < len; j++){
-                this.playerDeck[winnerIndex].push(this.holdOutDeck[i].pop());
+                this.playerDeck[playerIndex].push(this.holdOutDeck[i].pop());
                 }   
             }
             
             // 게임 정보 업데이트
-            this.gameInfo.players[winnerIndex].leftCards = this.playerDeck[winnerIndex].length;
+            this.gameInfo.players[playerIndex].leftCards = this.playerDeck[playerIndex].length;
             this.gameInfo.nowState = 2;             // 카드 분배 중 일시정지                                       
-            this.gameInfo.nowTurn = winnerIndex;    // 이긴 사람부터 다시시작
+            this.gameInfo.nowTurn = playerIndex;    // 이긴 사람부터 다시시작
 
             return 2;
         }
     
         else {  // 잘못 친 경우
-            var penaltyIndex = this.getPlayerIndex(player);
-
-            for (var i = 0; i < this.players.length; i++) {
-                if (this.players[i].name == player) {
-                    penaltyIndex = i;
-                    break;
-                }
-            }      
 
             for (var i = 0; i < this.NOW_PLAYER; i++){
-                if (this.playerDeck[penaltyIndex].length < 1) {
+                if (this.playerDeck[playerIndex].length < 1) {
                     // 카드가 비게 되면 중단, 벌칙받은 플레이어는 패배  
                     break;
                 }
-                else if (i != penaltyIndex) {
-                    this.playerDeck[i].push(this.playerDeck[penaltyIndex].pop());
+                else if (i != playerIndex) {
+                    this.playerDeck[i].push(this.playerDeck[playerIndex].pop());
                 }   
                 this.gameInfo.players[i].leftCards = this.playerDeck[i].length;
             }

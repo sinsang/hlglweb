@@ -1,7 +1,7 @@
 var socket = io();
 
 var game = {};
-var info = {index : roomNum, hostName : hostName, playerId : player};
+var info = {index : roomNum, hostName : hostName, playerId : player, TOKEN : TOKEN};
 
 var hitBellSound = new Audio("../../sounds/hitBell.mp3");
 hitBellSound.loop = false;
@@ -10,6 +10,57 @@ hitBellSound.volume = 0.6;
 var holdOutCardSound = new Audio("../../sounds/holdOutCard.mp3");
 holdOutCardSound.loop = false;
 holdOutCardSound.volume = 0.6;
+
+// 상대 카드 렌더링 (css 조정)
+var anotherPlayersModifyCss = () => {
+    var anotherPlayersDivWidth = $("#anotherPlayersDiv").css("width").replace("px", "") * 1;
+    var anotherPlayersDivHeight = $("#anotherPlayersDiv").css("height").replace("px", "") * 1;
+
+    for (var i = 0; i < $(".anotherPlayer").length; i++) {
+        $(".anotherPlayer").eq(i).css("margin-top", anotherPlayersDivHeight / 2 - $(".anotherPlayer").eq(0).css("height").replace("px","") * 0.3 + "px");
+    }
+    
+    switch ($(".anotherPlayer").length) {
+        case 1: // 상대방 1명
+            $(".anotherPlayer").eq(0).css("margin-left", anotherPlayersDivWidth / 2 - $(".anotherPlayer").eq(0).css("width").replace("px","") * 1 / 2 + "px");
+            break;
+
+        case 2: // 상대방 2명
+            $(".anotherPlayer").eq(0).css("margin-left", anotherPlayersDivWidth / 2 - $(".anotherPlayer").eq(0).css("width").replace("px","") * 2 + "px");
+            $(".anotherPlayer").eq(0).css("transform", "rotate(-30deg)");
+
+            $(".anotherPlayer").eq(1).css("margin-left", anotherPlayersDivWidth / 2 + $(".anotherPlayer").eq(0).css("width").replace("px","") * 1 + "px");
+            $(".anotherPlayer").eq(1).css("transform", "rotate(30deg)");
+            break;
+
+        case 3: // 상대방 3명
+            $(".anotherPlayer").eq(0).css("margin-top", $("#bellDiv").css("margin-top").replace("px","") * 1 - $(".anotherPlayer").eq(0).css("width").replace("px","") * 0.3 + "px");
+            $(".anotherPlayer").eq(0).css("margin-left", anotherPlayersDivWidth / 2 - $(".anotherPlayer").eq(0).css("height").replace("px","") * 1.3 + "px");
+            $(".anotherPlayer").eq(0).css("transform", "rotate(-90deg)");
+
+            $(".anotherPlayer").eq(1).css("margin-left", anotherPlayersDivWidth / 2 - $(".anotherPlayer").eq(0).css("width").replace("px","") * 1 / 2 + "px");
+
+            $(".anotherPlayer").eq(2).css("margin-top", $("#bellDiv").css("margin-top").replace("px","") * 1 - $(".anotherPlayer").eq(2).css("width").replace("px","") * 0.3 + "px");
+            $(".anotherPlayer").eq(2).css("margin-left", anotherPlayersDivWidth / 2 + $(".anotherPlayer").eq(0).css("height").replace("px","") * 0.7 + "px");
+            $(".anotherPlayer").eq(2).css("transform", "rotate(90deg)");
+            break;
+        case 4:
+            $(".anotherPlayer").eq(0).css("margin-top", $("#bellDiv").css("margin-top").replace("px","") * 1 - $(".anotherPlayer").eq(0).css("width").replace("px","") * 0.3 + "px");
+            $(".anotherPlayer").eq(0).css("margin-left", anotherPlayersDivWidth / 2 - $(".anotherPlayer").eq(0).css("height").replace("px","") * 1.5 + "px");
+            $(".anotherPlayer").eq(0).css("transform", "rotate(-90deg)");
+
+            $(".anotherPlayer").eq(1).css("margin-left", anotherPlayersDivWidth / 2 - $(".anotherPlayer").eq(0).css("width").replace("px","") * 1.7 + "px");
+            $(".anotherPlayer").eq(1).css("transform", "rotate(-30deg)");
+
+            $(".anotherPlayer").eq(2).css("margin-left", anotherPlayersDivWidth / 2 + $(".anotherPlayer").eq(0).css("width").replace("px","") * 0.7 + "px");
+            $(".anotherPlayer").eq(2).css("transform", "rotate(30deg)");
+
+            $(".anotherPlayer").eq(3).css("margin-top", $("#bellDiv").css("margin-top").replace("px","") * 1 - $(".anotherPlayer").eq(2).css("width").replace("px","") * 0.3 + "px");
+            $(".anotherPlayer").eq(3).css("margin-left", anotherPlayersDivWidth / 2 + $(".anotherPlayer").eq(0).css("height").replace("px","") * 1 + "px");
+            $(".anotherPlayer").eq(3).css("transform", "rotate(90deg)");
+
+    }
+}
 
 // 게임 정보에 맞게 렌더링
 var render = (gameInfo) => {
@@ -26,7 +77,7 @@ var render = (gameInfo) => {
     // playerCard render
     $("#anotherPlayersDiv").html("");
     for (var i = playerPos + 1; i < gameInfo.players.length; i++){
-        var tmp = "<div class=\"anotherPlayer\">" + gameInfo.players[i].name + "<br/>";
+        var tmp = "<div class=\"anotherPlayer\">" + gameInfo.players[i].name + ":" + gameInfo.players[i].leftCards + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
             tmp += "<div class=\"another card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
@@ -38,7 +89,7 @@ var render = (gameInfo) => {
         $("#anotherPlayersDiv").append(tmp);
     }
     for (var i = 0; i < playerPos; i++){
-        var tmp = "<div class=\"another\">" + gameInfo.players[i].name + "<br/>";
+        var tmp = "<div class=\"another\">" + gameInfo.players[i].name + ":" + gameInfo.players[i].leftCards + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
             tmp += "<div class=\"card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
@@ -83,6 +134,9 @@ var render = (gameInfo) => {
                 break;
         }
     }
+
+    // modify css
+    anotherPlayersModifyCss();
 
 };
 
@@ -140,9 +194,9 @@ socket.on("getRoomInfo", (roomInfo) => {
 });
 
 // joinRoom
-socket.emit("joinRoom", {index : roomNum, hostName : hostName, playerId : player});
+socket.emit("joinRoom", info);
 
 // css 
 $("#menu").css("padding-top", $(".hamburger").css("width"));
-$("#myDiv").css("margin-top", $("#anotherPlayersDiv").css("height").replace("px", "") * 1 + $("#bellDiv").css("height").replace("px", "") * 1 + 5 + "px");
+$("#myDiv").css("margin-top", $("#anotherPlayersDiv").css("height").replace("px", "") * 1 + $("#bellDiv").css("height").replace("px", "") * 1 + 30 + "px");
 $("#bellDiv").css("margin-top", $("#anotherPlayersDiv").css("height"));

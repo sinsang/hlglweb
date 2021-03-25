@@ -80,9 +80,10 @@ app.io.on("connection", (socket) => {
   socket.on("hitBell", (info) => {socketApp.hitBell(socket, app.io, info)});
   socket.on("holdOutCard", (info) => {socketApp.holdOutCard(socket, app.io, info)});
   socket.on("gameStart", (info) => {socketApp.gameStart(socket, app.io, info)});
-  socket.on("disconnect", () => {socketApp.disconnect(socket, app.io)});
+  //socket.on("disconnect", () => {socketApp.disconnect(socket, app.io)});
 
   socket.on("getRoom", (info) => {socketApp.getRoom(socket, app.io, info)});
+  
 });
 
 module.exports = app;

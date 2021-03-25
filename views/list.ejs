@@ -21,8 +21,9 @@
         <br/>
         방 생성하기
         <form action="../game/makeRoom" method="POST">
-            <input type="text" name="hostName" value="<%= user.name %>" style="display: none;">
+            <input type="hidden" name="hostName" value="<%= user.name %>">
             <input type="text" name="password" placeholder="패스워드">
+            <input type="hidden" nme="TOKEN" value="<%= TOKEN %>">
             <input type="submit" value="방 생성">
         </form>
     </body>
@@ -38,6 +39,7 @@
                 isPlaying = eval($(item).attr("isPlaying"))
                 pwd = null;
                 playerId = "<%= user.name %>";
+                TOKEN = "<%= TOKEN %>";
                 
                 if (isPlaying) {
                     alert("해당 방은 이미 플레이 중입니다.");
@@ -46,7 +48,7 @@
                     pwd = prompt("비밀번호를 입력하세요");
                     $.ajax({
                         url : "../game/enterRoom",
-                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId },
+                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId, TOKEN : TOKEN },
                         type : "POST",
                         dataType : "json"
                     })
@@ -63,7 +65,7 @@
                 else if (confirm($(item).attr("id") + "의 방에 입장하겠습니까?")) {
                     $.ajax({
                         url : "../game/enterRoom",
-                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId },
+                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId, TOKEN : TOKEN },
                         type : "POST",
                         dataType : "json"
                     })

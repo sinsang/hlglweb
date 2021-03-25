@@ -37,16 +37,15 @@
             </div>
 
             <div id="myDiv">
-                <div class="card" id="myHoldOutCard" style="background-color: red;">
-                </div>
+                <div class="card" id="myHoldOutCard" style="background-color: red;"></div>
                 <br/>
                 <div class="deck" id="myDeck">
                     <img id="myCard" src="../../images/deck.png"/>
                 </div>
-                <br/>
+            </div>
+            <div id="state">
                 <div id="playerStat"></div><br/><div id="nowTurn"></div>
             </div>
-
             <div id="notice"></div>
         </section>
 
@@ -60,10 +59,12 @@
         var roomNum = <%= roomNum %>;
         var hostName = "<%= hostName %>";
         var player = "<%= player.name %>";
+        var TOKEN = "<%= TOKEN %>";
     </script>
     <script src="../../javascripts/jquery-3.6.0.min.js"></script>
     <script src="../../javascripts/socket.io.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="../../javascripts/hlglGame.js"></script>
+
 </html>

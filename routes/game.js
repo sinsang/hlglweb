@@ -4,45 +4,27 @@ var express = require('express');
 const { test } = require("../socketApp");
 var router = express.Router();
 
-var createNewPlayer = (index, playerId) => {
-  var newPlayer = {
-    name : playerId,
-    available : true,
-    surfaceCard : {fruit : 1, num : 0},
-    leftCards : 0
-  };
-
-  app.nowRooms[index].players.push(playerId);
-  app.nowRooms[index].gameInfo.players.push(newPlayer);
-  //app.nowRooms[index].gameInfo.playerAvailable.push(true);
-  app.nowRooms[index].playerDeck.push([]);
-  app.nowRooms[index].holdOutDeck.push([]);
-  //app.nowRooms[index].gameInfo.playerSurfaceCard.push({fruit: 1, num: 0});
-  //app.nowRooms[index].gameInfo.playerLeftCards.push(0);
-  app.nowRooms[index].NOW_PLAYER++;
-}
-
-var createNewDeck = () => {
-  var newDeck = [];
-  for (var i = 1; i <= 4; i++){
-    for (var j = 0; j < 5; j++) { newDeck.push({fruit: i, num: 1}); }
-    for (var j = 0; j < 3; j++) { newDeck.push({fruit: i, num: 2}); }
-    for (var j = 0; j < 3; j++) { newDeck.push({fruit: i, num: 3}); }
-    for (var j = 0; j < 2; j++) { newDeck.push({fruit: i, num: 4}); }
-    for (var j = 0; j < 1; j++) { newDeck.push({fruit: i, num: 5}); }
+function checkSession (session) {
+  if (session == undefined) {
+    console.log("유효하지 않은 세션의 요청");
+    return false;
   }
-  return newDeck;
+  return true;
 }
+function checkToken (TOKEN, info) {
 
+}
 function isEmpty(param) {
   return Object.keys(param).length === 0;
 }
+function UUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.send("합격")
-});
-
 router.get("/login", (req, res, next) => {
   if (req.session.user){
     res.redirect("../game/list");
@@ -57,6 +39,7 @@ router.get("/list", (req, res) => {
   if (req.session.user){
     res.render('list', {
       user : req.session.user,
+      TOKEN : req.session.TOKEN,
       rooms : app.nowRooms
     });
   }
@@ -67,11 +50,15 @@ router.get("/list", (req, res) => {
 
 router.get("/play/:roomNum", (req, res, next) => {
 
-  if (app.nowRooms[req.params.roomNum].players.indexOf(req.session.user.name) != -1){
+  if (!checkSession(req.session.user) || isEmpty(app.nowRooms[req.params.roomNum])) {
+    res.send("잘못된 접근입니다.");
+  }
+  else if (app.nowRooms[req.params.roomNum].players.indexOf(req.session.user.name) != -1){
     res.render("hlglGame", {
       roomNum : req.params.roomNum,
       hostName : app.nowRooms[req.params.roomNum].hostName,
-      player : req.session.user
+      player : req.session.user,
+      TOKEN : req.session.TOKEN
     });
   }
   else {
@@ -98,6 +85,7 @@ router.post("/check", (req, res, next) => {
   
   app.nowUsers.push(newUser);
   req.session.user = newUser;
+  req.session.TOKEN = UUID();
   
   res.redirect("../game/list");
 
@@ -110,6 +98,11 @@ router.post("/logout", (req, res, next) => {
 });
 
 router.post("/makeRoom", (req, res, next) => {
+
+  if (!checkSession(req.session.user)) {
+    res.send("잘못된 요청입니다.");
+    return;
+  }
   
   var newCard = {
     fruit : 1,
@@ -186,6 +179,11 @@ router.post("/makeRoom", (req, res, next) => {
 
 router.post("/enterRoom", (req, res, next) => {
 
+  if (!checkSession(req.session.user) || isEmpty(app.nowRooms[req.params.roomNum])) {
+    res.send("잘못된 접근입니다.");
+    return;
+  }
+
   var index = req.body.index;
   var gameId = req.body.gameId;
   var pwd = req.body.pwd;
@@ -206,18 +204,6 @@ router.post("/enterRoom", (req, res, next) => {
   }
   
   res.send({result : false});
-
-});
-
-router.post("/exitRoom", (req, res, next) => {
-  
-  var index = req.body.index;
-  var gameId = req.body.gameId;
-  var playerId = req.body.playerId;
-
-  //player가 host일 때
-
-  //player가 혼자 남았을 때
 
 });
 

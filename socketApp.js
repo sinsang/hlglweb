@@ -1,5 +1,4 @@
 const e = require("express");
-const { io } = require("./app");
 var app = require("./app");
 
 var checkPlayer = (info, socket) => {
@@ -11,33 +10,29 @@ var checkHost = (info) => {
 var isHost = (info, socket) => {
   return checkPlayer(info, socket) && app.nowRooms[info.index].hostName == info.playerId;
 }
-var createNewDeck = () => {
-  var newDeck = [];
-  for (var i = 1; i <= 4; i++){
-    for (var j = 0; j < 5; j++) { newDeck.push({fruit: i, num: 1}); }
-    for (var j = 0; j < 3; j++) { newDeck.push({fruit: i, num: 2}); }
-    for (var j = 0; j < 3; j++) { newDeck.push({fruit: i, num: 3}); }
-    for (var j = 0; j < 2; j++) { newDeck.push({fruit: i, num: 4}); }
-    for (var j = 0; j < 1; j++) { newDeck.push({fruit: i, num: 5}); }
-  }
-  return newDeck;
-}
-function shuffle(sourceArray) {
-  for (var i = 0; i < sourceArray.length - 1; i++) {
-      var j = i + Math.floor(Math.random() * (sourceArray.length - i));
-
-      var temp = sourceArray[j];
-      sourceArray[j] = sourceArray[i];
-      sourceArray[i] = temp;
-  }
-  return sourceArray;
-}
 function isEmpty(param) {
   return Object.keys(param).length === 0;
+}
+function checkSession (session) {
+  if (session == undefined) {
+    console.log("유효하지 않은 세션의 요청");
+    return false;
+  }
+  return true;
+}
+function checkToken (socket, TOKEN) {   // TOKEN을 통해 위조된 요청 감지
+  return TOKEN == socket.handshake.session.TOKEN;
 }
 
 // socket Fucntion
 exports.joinRoom = (socket, io, info) => {
+  
+  if (!checkSession(socket.handshake.session.user)){
+    return;
+  }
+  if (!checkToken(socket, info.TOKEN)) {
+    return;
+  }
   if (isEmpty(app.nowRooms[info.index])){
     return;
   }
@@ -48,10 +43,17 @@ exports.joinRoom = (socket, io, info) => {
   else {
     console.log("잘못된 접근 : " + socket.handshake.session);
   }
+
 };
 
 exports.hitBell = (socket, io, info) => {
 
+  if (!checkSession(socket.handshake.session.user)){
+    return;
+  }
+  if (!checkToken(socket, info.TOKEN)) {
+    return;
+  }
   if (isEmpty(app.nowRooms[info.index])){
     return;
   }
@@ -99,10 +101,15 @@ exports.hitBell = (socket, io, info) => {
 
 exports.holdOutCard = (socket, io, info) => {
   
+  if (!checkSession(socket.handshake.session.user)){
+    return;
+  }
+  if (!checkToken(socket, info.TOKEN)) {
+    return;
+  }
   if (isEmpty(app.nowRooms[info.index])){
     return;
   }
-
   if (checkPlayer(info, socket) && checkHost(info)){
     
     switch (app.nowRooms[info.index].holdOutCard(info.playerId)) {
@@ -142,6 +149,12 @@ exports.holdOutCard = (socket, io, info) => {
 
 exports.gameStart = (socket, io, info) => {
 
+  if (!checkSession(socket.handshake.session.user)){
+    return;
+  }
+  if (!checkToken(socket, info.TOKEN)) {
+    return;
+  }
   if (isEmpty(app.nowRooms[info.index])){
     return;
   }
@@ -166,6 +179,10 @@ exports.gamePause = (socket, io, info) => {
 }
 
 exports.disconnect = (socket, io) => {
+
+  if (!checkSession(socket.handshake.session.user)){
+    return;
+  }
 
   var player = socket.handshake.session.user.name;
   var room = socket.handshake.session.user.room;
