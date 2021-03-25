@@ -7,6 +7,7 @@ var createNewDeck = () => {
       for (var j = 0; j < 2; j++) { newDeck.push({fruit: i, num: 4}); }
       for (var j = 0; j < 1; j++) { newDeck.push({fruit: i, num: 5}); }
     }
+
     return newDeck;
 }
 var shuffle = (sourceArray) => {
@@ -78,7 +79,7 @@ exports.GAME = class game {
     gameStart = () => {
         var newDeck = createNewDeck();
     
-        for (var i = 0; i < 10; i++) shuffle(newDeck);
+        for (var i = 0; i < 10; i++) newDeck = shuffle(newDeck);
         
         var cardPerPlayer = parseInt(newDeck.length / this.NOW_PLAYER);
 

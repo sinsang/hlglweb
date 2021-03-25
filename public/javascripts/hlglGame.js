@@ -12,7 +12,7 @@ holdOutCardSound.loop = false;
 holdOutCardSound.volume = 0.6;
 
 var preLoading = () => {
-    for (var i = 1; i <= 5; i++){
+    for (var i = 1; i <= 4; i++){
         for (var j = 1; j <= 5; j++){
             var img = new Image();
             img.src = "../../images/" + i + "_" + j + ".png";
@@ -174,7 +174,6 @@ $(".hamburger").click((e) => {
 
 $("#showLog").click((e) => {
     $("#notice").toggle();
-    $("#notice").draggable();
 })
 
 // from Server
@@ -212,3 +211,5 @@ preLoading();
 $("#menu").css("padding-top", $(".hamburger").css("width"));
 $("#myDiv").css("margin-top", $("#anotherPlayersDiv").css("height").replace("px", "") * 1 + $("#bellDiv").css("height").replace("px", "") * 1 + 30 + "px");
 $("#bellDiv").css("margin-top", $("#anotherPlayersDiv").css("height"));
+$("#notice").draggable();
+$("#notice").css("margin-top", $("#myDiv").css("margin-top").replace("px", "") * 1 - 20 + "px");
