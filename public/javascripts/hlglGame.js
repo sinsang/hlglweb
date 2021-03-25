@@ -11,6 +11,15 @@ var holdOutCardSound = new Audio("../../sounds/holdOutCard.mp3");
 holdOutCardSound.loop = false;
 holdOutCardSound.volume = 0.6;
 
+var preLoading = () => {
+    for (var i = 1; i <= 5; i++){
+        for (var j = 1; j <= 5; j++){
+            var img = new Image();
+            img.src = "../../images/" + i + "_" + j + ".png";
+        }
+    }
+}
+
 // 상대 카드 렌더링 (css 조정)
 var anotherPlayersModifyCss = () => {
     var anotherPlayersDivWidth = $("#anotherPlayersDiv").css("width").replace("px", "") * 1;
@@ -195,6 +204,9 @@ socket.on("getRoomInfo", (roomInfo) => {
 
 // joinRoom
 socket.emit("joinRoom", info);
+
+// img preloading
+preLoading();
 
 // css 
 $("#menu").css("padding-top", $(".hamburger").css("width"));
