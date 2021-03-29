@@ -35,7 +35,10 @@
                 dataType : "json"
             })
             .done((result) => {
-                if (result.msg){
+                if (result.result) {
+                    location.href = "../game/list";
+                }
+                else {
                     alert(result.msg);
                 }
             })

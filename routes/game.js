@@ -100,7 +100,7 @@ router.post("/check", (req, res, next) => {
 
   for (var i = 0; i < app.nowUsers.length; i++){  // 중복처리
     if (app.nowUsers[i].name == reqName){
-      res.send({ msg : "중복된 이름이 있습니다" });
+      res.send({ result : false, msg : "중복된 이름이 있습니다" });
       return;
     }
   }
@@ -109,7 +109,7 @@ router.post("/check", (req, res, next) => {
   req.session.user = newUser;
   req.session.TOKEN = UUID();
   
-  res.redirect("../game/list");
+  res.send({ result : true, msg : "" });
 
 });
 
@@ -154,7 +154,6 @@ router.post("/makeRoom", (req, res, next) => {
     app.nowPwds[index] = pwd;
     req.session.user.room = index;
     app.nowRooms[index].createNewPlayer(req.body.hostName);
-    console.log("방 만들어짐");
     res.send({ index : index });
   }
   else {
