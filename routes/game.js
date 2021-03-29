@@ -79,22 +79,22 @@ router.post("/check", (req, res, next) => {
   };
 
   if (req.session.user) {     // 이미 로그인 세션이 있는 경우
-    res.send({ msg : "잘못된 요청입니다."});
+    res.send({ result : false, msg : "잘못된 요청입니다."});
     return;
   }
 
   if (reqName == "" || reqName == undefined || reqName == null) {   // 유효하지 않은 이름
-    res.send({ msg : "유효하지 않은 닉네임입니다."});
+    res.send({ result : false, msg : "유효하지 않은 닉네임입니다."});
     return;
   }
 
   if (pattern_spc.test(reqName)) {  // 특수문자가 포함된 이름
-    res.send({ msg : "특수문자가 포함된 닉네임은 사용이 불가능 합니다."});
+    res.send({ result : false, msg : "특수문자가 포함된 닉네임은 사용이 불가능 합니다."});
     return;
   }
 
   if (reqName.length > 12) {        // 12자리가 넘는 이름
-    res.send({ msg : "12자리 이상의 닉네임은 사용이 불가능 합니다."});
+    res.send({ result : false, msg : "12자리 이상의 닉네임은 사용이 불가능 합니다."});
     return;
   }
 
@@ -109,7 +109,7 @@ router.post("/check", (req, res, next) => {
   req.session.user = newUser;
   req.session.TOKEN = UUID();
   
-  res.send({ result : true, msg : "" });
+  res.send({ result : true, msg : "로그인 성공" });
 
 });
 
