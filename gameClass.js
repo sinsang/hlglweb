@@ -143,7 +143,7 @@ exports.GAME = class game {
             return 3;
         }
 
-        var getCard = this.playerDeck[playerIndex].pop();
+        var getCard = this.playerDeck[playerIndex].shift();
         
         this.holdOutDeck[playerIndex].push(getCard);
 
