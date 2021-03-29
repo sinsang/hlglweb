@@ -1,13 +1,46 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>GAME LOGIN</title>
+        <title>HLGL LOGIN</title>
     </head>
+    <link href="../stylesheets/loginStyle.css" rel="stylesheet" type="text/css" />
     <body>
-        <form action="../game/check" method="POST">
-            <input type="text" name="username" placeholder="닉네임입력">
-            <input type="submit">
-        </form>
+        <div id="backBoard">
+            <div id="logo"><h1>HLGL</h1></div>
+            <div id="loginForm">
+                <form id="login">
+                    <input id="name" type="text" name="username" placeholder="닉네임입력">
+                    <br/>
+                    <input type="submit" value="입장">
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            Copyright 2021. 신상우 all rights reserved.<br/>
+            sw980321@naver.com
+        </footer>
     </body>
-    <script src="../javascripts/socket.io.js"></script>
+
+    <script src="../javascripts/jquery-3.6.0.min.js"></script>
+    <script>
+        $("#login").submit((e) => {
+
+            var userName = $("#name").val();
+
+            $.ajax({
+                url : "../game/check",
+                data : { userName: userName },
+                type : "POST",
+                dataType : "json"
+            })
+            .done((result) => {
+                if (result.msg){
+                    alert(result.msg);
+                }
+            })
+
+            return;
+        });
+    </script>
 </html>

@@ -70,15 +70,37 @@ router.get("/play/:roomNum", (req, res, next) => {
 /* POST */
 router.post("/check", (req, res, next) => {
 
-  var reqName = req.body.username;
+  var pattern_spc = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자 테스트
+
+  var reqName = req.body.userName;
   var newUser = {
     name : reqName,
     room : -1
   };
 
-  for (var i = 0; i < app.nowUsers.length; i++){
+  if (req.session.user) {     // 이미 로그인 세션이 있는 경우
+    res.send({ msg : "잘못된 요청입니다."});
+    return;
+  }
+
+  if (reqName == "" || reqName == undefined || reqName == null) {   // 유효하지 않은 이름
+    res.send({ msg : "유효하지 않은 닉네임입니다."});
+    return;
+  }
+
+  if (pattern_spc.test(reqName)) {  // 특수문자가 포함된 이름
+    res.send({ msg : "특수문자가 포함된 닉네임은 사용이 불가능 합니다."});
+    return;
+  }
+
+  if (reqName.length > 12) {        // 12자리가 넘는 이름
+    res.send({ msg : "12자리 이상의 닉네임은 사용이 불가능 합니다."});
+    return;
+  }
+
+  for (var i = 0; i < app.nowUsers.length; i++){  // 중복처리
     if (app.nowUsers[i].name == reqName){
-      res.redirect("../game/login");
+      res.send({ msg : "중복된 이름이 있습니다" });
       return;
     }
   }
@@ -103,56 +125,18 @@ router.post("/makeRoom", (req, res, next) => {
     res.send("잘못된 요청입니다.");
     return;
   }
-  
-  var newCard = {
-    fruit : 1,
-    num : 0 
-  }
 
-  // 클라이언트로 보낼 게임 정보
-  var gameInfo = {
-    nowState : 0, // 현재 게임 상태   0: 대기, 1: 플레이, 2: 일시정지(카드 분배 등), 3: 종료(결과창)
-    nowTurn : 0,  // 현재 턴 
-    players : [], // 현재 플레이어 
-    time : 0,     // 남은 시간
+  if (req.body.TOKEN != req.session.TOKEN) {
+    res.send("유효하지 않은 세션입니다.");
+    return;
   }
-
-  // 서버에 남을 정보
-  var newRoom = {
-    id : 0,
-    hostName : req.body.hostName,
-    isLocked : false,
-    isPlaying : false,        
-    gameMode : 0,
-    players : [],
-    surfaceCardsSum : [0, 0, 0, 0],   // 내민 카드 중 표면들의 총 합
-    holdOutDeck : [],               // 내밀어서 쌓인 카드들
-    playerDeck : [],                // 플레이어에게 남은 카드
-    MAX_PLAYER : 5,
-    NOW_PLAYER : 0, 
-    gameInfo : gameInfo  
-  }
-
-  /*
-  var testRoom = {
-    hostName : req.body.hostName,
-    isLocked : false,
-    gameMode : 0,
-    players : [req.body.hostName],
-    playersHand : [0],
-    nowState : 0,
-    MAX_PLAYER : 2
-  }
-  */
 
   var pwd = {
     hostName : req.body.hostName,
     pwd : req.body.password
   }
 
-  if (pwd.pwd != ''){
-    newRoom.isLocked = true;
-  }
+  console.log(pwd.pwd);
 
   var index = -1;
   for (var i = 0; i < app.MAX_ROOM; i++) {
@@ -164,12 +148,14 @@ router.post("/makeRoom", (req, res, next) => {
 
   if (index > -1){
     app.nowRooms[index] = new gameClass.GAME(index, req.body.hostName);
-    //app.nowRooms[index] = newRoom;
+    if (pwd.pwd != ''){
+      app.nowRooms[index].isLocked = true;
+    }
     app.nowPwds[index] = pwd;
     req.session.user.room = index;
     app.nowRooms[index].createNewPlayer(req.body.hostName);
-    console.log(app.nowRooms[index]);
-    res.redirect("../game/play/" + index);
+    console.log("방 만들어짐");
+    res.send({ index : index });
   }
   else {
     res.send("방을 생성할 수 없습니다.");
@@ -179,7 +165,7 @@ router.post("/makeRoom", (req, res, next) => {
 
 router.post("/enterRoom", (req, res, next) => {
 
-  if (!checkSession(req.session.user) || isEmpty(app.nowRooms[req.params.roomNum])) {
+  if (!checkSession(req.session.user)) {
     res.send("잘못된 접근입니다.");
     return;
   }
@@ -189,7 +175,11 @@ router.post("/enterRoom", (req, res, next) => {
   var pwd = req.body.pwd;
   var playerId = req.body.playerId;
 
-  //console.log(pwd, app.nowPwds[index].pwd);
+  if (isEmpty(app.nowRooms[index])) {
+    res.send("존재하지 않는 방입니다");
+    return;
+  }
+
   if (app.nowRooms[index].hostName == gameId && app.nowPwds[index].hostName == gameId){
     if (app.nowRooms[index].isPlaying){
       res.send({result : false});

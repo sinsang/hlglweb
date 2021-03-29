@@ -1,39 +1,67 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>GAME LIST</title>
+        <title>HLGL GAME LIST</title>
     </head>
-    <body>
-        <%= user.name %>님, 환영합니다.
-        <form action="../game/logout" method="POST">
-            <input type="submit" value="로그아웃">
-        </form>
-        
-        <% function isEmpty(param) { return Object.keys(param).length === 0; } %>
-        <ul id="gameList">
-        <% for (var i = 0; i < rooms.length; i++) { %>
-            <% if (!isEmpty(rooms[i])) { %>
-            <li id="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>" isPlaying="<%= rooms[i].isPlaying %>"><%= rooms[i].hostName %>의 방</li>
-            <% } %>
-        <% } %>
-        </ul>
 
-        <br/>
-        방 생성하기
-        <form action="../game/makeRoom" method="POST">
-            <input type="hidden" name="hostName" value="<%= user.name %>">
-            <input type="text" name="password" placeholder="패스워드">
-            <input type="hidden" nme="TOKEN" value="<%= TOKEN %>">
-            <input type="submit" value="방 생성">
-        </form>
+    <link href="../stylesheets/hamburgers.css" rel="stylesheet" type="text/css" />
+    <link href="../stylesheets/listStyle.css" rel="stylesheet" type="text/css" />
+
+    <body>
+        <div id="backBoard">
+            <button class="hamburger hamburger--squeeze" type="button">  
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span> 
+            </button>
+            <div id="menu">
+                <%= user.name %>님,<br/>
+                환영합니다.
+                <br/>
+                <form action="../game/logout" method="POST">
+                    <input type="submit" value="로그아웃">
+                </form>
+            </div>
+
+            <div id="gameList">
+                <h2>생성된 방 목록</h2><br/>
+                <% function isEmpty(param) { return Object.keys(param).length === 0; } %>
+                <ul>
+                <% for (var i = 0; i < rooms.length; i++) { %>
+                    <% if (!isEmpty(rooms[i])) { %>
+                    <li class="room" index="<%= i %>" id="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>" isPlaying="<%= rooms[i].isPlaying %>"><%= rooms[i].hostName %>의 방</li>
+                    <% } %>
+                <% } %>
+                </ul>        
+            </div>
+
+            <div id="createRoomDiv">
+                방 생성하기
+                <form id="createRoom">
+                    <input type="text" id="password" placeholder="패스워드">
+                    <input type="submit" value="방 생성">
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            Copyright 2021. 신상우 all rights reserved.<br/>
+            sw980321@naver.com
+        </footer>
     </body>
+
     <script src="../javascripts/jquery-3.6.0.min.js"></script>
     <script src="../javascripts/socket.io.js"></script>
     <script>
+        $(".hamburger").click((e) => {
+            document.querySelector(".hamburger").classList.toggle("is-active");
+            $("#menu").slideToggle("fast");
+        });
 
-        $("#gameList").children().each((index, item) => {
+        $(".room").each((index, item) => {
             $(item).click((e) => {
-                index = index;
+
+                index = $(item).attr("index") * 1;
                 gameId = $(item).attr("id");
                 isLocked = eval($(item).attr("lock"));
                 isPlaying = eval($(item).attr("isPlaying"))
@@ -78,5 +106,27 @@
                 }
             });
         });
+
+        $("#createRoom").submit((e) => {
+
+            e.preventDefault();
+            var hostName = "<%= user.name %>";
+            var TOKEN = "<%= TOKEN %>";
+
+            if (!confirm("정말 방을 만드시겠습니까?")) return;
+
+            $.ajax({
+                url : "../game/makeRoom",
+                data : { password: $("#password").val(), hostName : hostName, TOKEN : TOKEN },
+                type : "POST",
+                dataType : "json"
+            }).done((data) => {
+                console.log(data);
+                location.href = "../game/play/" + data.index;
+            });
+            
+        });
+
+        $("#menu").css("padding-top", $(".hamburger").css("width"));
     </script>
 </html>

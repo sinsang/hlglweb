@@ -1,0 +1,59 @@
+html {
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+body {
+    margin: 0px;
+    padding: 0px;
+
+    width: 100%;
+    height: 100%;
+}
+
+#backBoard {
+    width: 100%;
+    height: 100%;
+
+    position: relative;
+
+    background-color: darkgrey;
+}
+
+#logo {
+    position: absolute;
+    
+    width: 100%;
+
+    text-align: center;
+
+    background-color: teal;
+
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#loginForm {
+    position: absolute;
+
+    text-align: center;
+    
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* footer */
+footer {
+    position: absolute;
+
+    width: 100%;
+    height: 5%;
+
+    top: 95%;
+
+    font-size: 8px;
+    text-align: center;
+}

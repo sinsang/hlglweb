@@ -98,7 +98,7 @@ var render = (gameInfo) => {
         $("#anotherPlayersDiv").append(tmp);
     }
     for (var i = 0; i < playerPos; i++){
-        var tmp = "<div class=\"another\">" + gameInfo.players[i].name + ":" + gameInfo.players[i].leftCards + "<br/>";
+        var tmp = "<div class=\"anotherPlayer\">" + gameInfo.players[i].name + ":" + gameInfo.players[i].leftCards + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
             tmp += "<div class=\"card\">";
             tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
