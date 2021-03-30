@@ -7,6 +7,22 @@ var checkPlayer = (info, socket) => {
 var checkHost = (info) => {
   return app.nowRooms[info.index].hostName == info.hostName
 }
+var checkInfo = (info) => {
+  if (info.index == undefined || info.index == null || typeof info.index != "number") {
+    return false;
+  }
+  if (info.hostName == undefined || info.hostName == null || typeof info.hostName != "string") {
+    return false;
+  }
+  if (info.playerId == undefined || info.playerId == null || typeof info.playerId != "string") {
+    return false;
+  }
+  if (info.TOKEN == undefined || info.TOKEN == null || typeof info.TOKEN != "string") {
+    return false;
+  }
+  
+  return true;
+}
 var isHost = (info, socket) => {
   return checkPlayer(info, socket) && app.nowRooms[info.index].hostName == info.playerId;
 }
@@ -30,12 +46,16 @@ exports.joinRoom = (socket, io, info) => {
   if (!checkSession(socket.handshake.session.user)){
     return;
   }
+  if (!checkInfo(info)){
+    return;
+  }
   if (!checkToken(socket, info.TOKEN)) {
     return;
   }
   if (isEmpty(app.nowRooms[info.index])){
     return;
   }
+
   if (checkPlayer(info, socket) && checkHost(info)){
     socket.join(info.index);
     io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
@@ -49,6 +69,9 @@ exports.joinRoom = (socket, io, info) => {
 exports.hitBell = (socket, io, info) => {
 
   if (!checkSession(socket.handshake.session.user)){
+    return;
+  }
+  if (!checkInfo(info)){
     return;
   }
   if (!checkToken(socket, info.TOKEN)) {
@@ -104,6 +127,9 @@ exports.holdOutCard = (socket, io, info) => {
   if (!checkSession(socket.handshake.session.user)){
     return;
   }
+  if (!checkInfo(info)){
+    return;
+  }
   if (!checkToken(socket, info.TOKEN)) {
     return;
   }
@@ -150,6 +176,9 @@ exports.holdOutCard = (socket, io, info) => {
 exports.gameStart = (socket, io, info) => {
 
   if (!checkSession(socket.handshake.session.user)){
+    return;
+  }
+  if (!checkInfo(info)){
     return;
   }
   if (!checkToken(socket, info.TOKEN)) {
