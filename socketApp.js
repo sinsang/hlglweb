@@ -9,15 +9,19 @@ var checkHost = (info) => {
 }
 var checkInfo = (info) => {
   if (info.index == undefined || info.index == null || typeof info.index != "number") {
+    console.log("걸림");
     return false;
   }
   if (info.hostName == undefined || info.hostName == null || typeof info.hostName != "string") {
+    console.log("걸림");
     return false;
   }
   if (info.playerId == undefined || info.playerId == null || typeof info.playerId != "string") {
+    console.log("걸림");
     return false;
   }
   if (info.TOKEN == undefined || info.TOKEN == null || typeof info.TOKEN != "string") {
+    console.log("걸림");
     return false;
   }
   

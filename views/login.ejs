@@ -25,7 +25,7 @@
     <script src="../javascripts/jquery-3.6.0.min.js"></script>
     <script>
         $("#login").submit((e) => {
-
+            e.preventDefault();
             var userName = $("#name").val();
 
             $.ajax({
