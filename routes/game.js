@@ -40,8 +40,12 @@ router.get("/list", (req, res) => {
 
     var rooms = []
     for (var i = 0; i < app.nowRooms.length; i++){
-      rooms.append(app.nowRooms[i].gameInfo);
+      if (!isEmpty(app.nowRooms[i])) {
+        rooms.push(app.nowRooms[i].gameInfo);
+      }
     }
+
+    console.log(rooms);
 
     res.render('list', {
       user : req.session.user,
