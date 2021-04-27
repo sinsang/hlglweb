@@ -9,19 +9,15 @@ var checkHost = (info) => {
 }
 var checkInfo = (info) => {
   if (info.index == undefined || info.index == null || typeof info.index != "number") {
-    console.log("걸림");
     return false;
   }
   if (info.hostName == undefined || info.hostName == null || typeof info.hostName != "string") {
-    console.log("걸림");
     return false;
   }
   if (info.playerId == undefined || info.playerId == null || typeof info.playerId != "string") {
-    console.log("걸림");
     return false;
   }
   if (info.TOKEN == undefined || info.TOKEN == null || typeof info.TOKEN != "string") {
-    console.log("걸림");
     return false;
   }
   
@@ -193,10 +189,21 @@ exports.gameStart = (socket, io, info) => {
   }
   if (isHost(info, socket)){
     
-    app.nowRooms[info.index].gameStart();
-
+    app.nowRooms[info.index].gameStart(2);
+    io.sockets.in(info.index).emit("timeCount", app.nowRooms[info.index].time);
+  
     io.sockets.in(info.index).emit("notice", "게임이 시작되었습니다.");
     io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
+
+    app.nowRooms[info.index].timeCount = setInterval(() => {
+      if (app.nowRooms[info.index].time <= 0) {
+        io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
+        io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
+        return;
+      }
+      app.nowRooms[info.index].time -= 1;
+      io.sockets.in(info.index).emit("timeCount", app.nowRooms[info.index].time);
+    }, 1000);
 
   }
   else {
@@ -252,6 +259,7 @@ exports.disconnect = (socket, io) => {
     socket.handshake.session.user.room = -1;
 
     if (app.nowRooms[room].NOW_PLAYER < 1){
+      app.roomIndex.push(app.nowRooms[room].id);
       app.nowRooms[room] = {};
     }
     else {
@@ -267,6 +275,10 @@ exports.disconnect = (socket, io) => {
 
 exports.getRoom = (socket, io, info) => {
   io.sockets.in(info.index).emit("getRoomInfo", app.nowRooms[info.index]);
+}
+
+exports.gameSet = (socket, io, info) => {
+  app.nowRooms[info.index].gameSet();
 }
 
 exports.pushHand = (socket, io, info) => {

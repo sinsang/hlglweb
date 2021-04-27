@@ -60,7 +60,9 @@ body {
     position: absolute;
 
     width: 50%;
-    height: 80%;
+    height: 60%;
+
+    overflow-y: scroll;
 
     top: 10%;
     left: 25%;

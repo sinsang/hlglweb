@@ -201,6 +201,10 @@ socket.on("getRoomInfo", (roomInfo) => {
     console.log(roomInfo);
 });
 
+socket.on("timeCount", (time) => {
+    $("#nowTime").html("남은 시간 : " + parseInt(time/60) + " 분 " + (time%60) + " 초");
+})
+
 // joinRoom
 socket.emit("joinRoom", info);
 

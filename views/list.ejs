@@ -29,7 +29,7 @@
                 <ul>
                 <% for (var i = 0; i < rooms.length; i++) { %>
                     <% if (!isEmpty(rooms[i])) { %>
-                    <li class="room" index="<%= i %>" id="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>" isPlaying="<%= rooms[i].isPlaying %>"><%= rooms[i].hostName %>의 방</li>
+                    <li class="room" index="<%= rooms[i].id %>" hostName="<%= rooms[i].hostName %>" lock="<%= rooms[i].isLocked %>" isPlaying="<%= rooms[i].isPlaying %>"><%= rooms[i].title %></li>
                     <% } %>
                 <% } %>
                 </ul>        
@@ -61,8 +61,8 @@
         $(".room").each((index, item) => {
             $(item).click((e) => {
 
-                index = $(item).attr("index") * 1;
-                gameId = $(item).attr("id");
+                roomIndex = $(item).attr("index") * 1;
+                hostName = $(item).attr("hostName");
                 isLocked = eval($(item).attr("lock"));
                 isPlaying = eval($(item).attr("isPlaying"))
                 pwd = null;
@@ -76,14 +76,14 @@
                     pwd = prompt("비밀번호를 입력하세요");
                     $.ajax({
                         url : "../game/enterRoom",
-                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId, TOKEN : TOKEN },
+                        data : { index : roomIndex, hostName : hostName, pwd : pwd, playerId : playerId, TOKEN : TOKEN },
                         type : "POST",
                         dataType : "json"
                     })
                     .done((data) =>{
                         console.log(data.result);
                         if (data.result) {
-                            location.href = "../game/play/" + index;           
+                            location.href = "../game/play/" + roomIndex;           
                         }
                         else {
                             alert("잘못된 패스워드입니다.");
@@ -93,14 +93,14 @@
                 else if (confirm($(item).attr("id") + "의 방에 입장하겠습니까?")) {
                     $.ajax({
                         url : "../game/enterRoom",
-                        data : { index : index, gameId : gameId, pwd : pwd, playerId : playerId, TOKEN : TOKEN },
+                        data : { index : roomIndex, hostName : hostName, pwd : pwd, playerId : playerId, TOKEN : TOKEN },
                         type : "POST",
                         dataType : "json"
                     })
                     .done((data) =>{
                         console.log(data.result);
                         if (data.result){
-                            location.href = "../game/play/" + index;
+                            location.href = "../game/play/" + roomIndex;
                         }
                     });
                 }

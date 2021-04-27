@@ -24,20 +24,11 @@ var shuffle = (sourceArray) => {
 exports.GAME = class game {   
 
     // 게임 생성
-    constructor(index, hostName) {       
-        // 클라이언트로 보낼 게임 정보
-        this.gameInfo = {
-            nowState : 0, // 현재 게임 상태   0: 대기, 1: 플레이, 2: 일시정지(카드 분배 등), 3: 종료(결과창)
-            nowTurn : 0,  // 현재 턴 
-            players : [], // 현재 플레이어 
-            time : 0,     // 남은 시간
-        };
+    constructor(index, hostName, pwd) {
         
         // 서버에 남을 정보
-        this.id = index;
         this.hostName = hostName;
-        this.isLocked = false;
-        this.isPlaying = false;        
+        this.pwd = pwd;      
         this.gameMode = 0;
         this.players = [];
         
@@ -46,7 +37,25 @@ exports.GAME = class game {
         this.playerDeck = [];                // 플레이어에게 남은 카드
         
         this.MAX_PLAYER = 5;
-        this.NOW_PLAYER = 0; 
+        this.NOW_PLAYER = 0;
+        
+        // 클라이언트로 보낼 게임 정보
+        this.gameInfo = {
+            id : index,
+            isLocked : false,
+            isPlaying : false,
+            hostName : this.hostName,  
+            title : this.hostName + "님의 방",
+            nowState : 0, // 현재 게임 상태   0: 대기, 1: 플레이, 2: 일시정지(카드 분배 등), 3: 종료(결과창)
+            nowTurn : 0,  // 현재 턴 
+            players : [], // 현재 플레이어 
+            time : 0,     // 남은 시간
+        };
+
+        if (this.pwd != "" && this.pwd != null) {
+            this.gameInfo.isLocked = true;
+        }
+
     }
     
     // 새 플레이어 생성
@@ -76,7 +85,8 @@ exports.GAME = class game {
     }
 
     // 게임시작
-    gameStart = () => {
+    gameStart = (time) => {
+        
         var newDeck = createNewDeck();
     
         for (var i = 0; i < 10; i++) newDeck = shuffle(newDeck);
@@ -92,9 +102,11 @@ exports.GAME = class game {
             this.gameInfo.players[i].available = true;
         }
 
-        this.isPlaying = true;
+        this.time = time;
+        this.gameInfo.isPlaying = true;
         this.gameInfo.nowTurn = 0;
         this.gameInfo.nowState = 1;
+
     }
 
     // 게임종료조건 체크 
@@ -108,6 +120,7 @@ exports.GAME = class game {
 
     // 게임종료, 결과 출력
     gameSet = () => {
+        clearInterval(this.timeCount);
         var result = this.gameInfo.players.slice();
 
         this.gameInfo.nowState = 0;

@@ -29,10 +29,17 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 // sessions
 exports.nowUsers = [];
-exports.nowRooms = [{}, {}, {}, {}, {}];
-exports.nowPwds = [{}, {}, {}, {}, {}];
+exports.nowRooms = [];
+exports.roomIndex = [];
+exports.nowPwds = [];
 
-exports.MAX_ROOM = 5;
+exports.MAX_ROOM = 5000;
+
+for (var i = 0 ; i < this.MAX_ROOM; i++){
+  this.nowRooms.push({});
+  //this.nowPwds.push({});
+  this.roomIndex.push(this.MAX_ROOM - i - 1);
+}
 
 var fileStoreOption = {
   reapInterval : 600

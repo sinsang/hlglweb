@@ -37,10 +37,16 @@ router.get("/login", (req, res, next) => {
 router.get("/list", (req, res) => {
   //console.log(req.session.user);
   if (req.session.user){
+
+    var rooms = []
+    for (var i = 0; i < app.nowRooms.length; i++){
+      rooms.append(app.nowRooms[i].gameInfo);
+    }
+
     res.render('list', {
       user : req.session.user,
       TOKEN : req.session.TOKEN,
-      rooms : app.nowRooms
+      rooms : rooms
     });
   }
   else{
@@ -78,6 +84,8 @@ router.post("/check", (req, res, next) => {
     room : -1
   };
 
+  console.log(reqName, " 로그인 시도");
+
   if (req.session.user) {     // 이미 로그인 세션이 있는 경우
     res.send({ result : false, msg : "잘못된 요청입니다."});
     return;
@@ -108,6 +116,8 @@ router.post("/check", (req, res, next) => {
   app.nowUsers.push(newUser);
   req.session.user = newUser;
   req.session.TOKEN = UUID();
+
+  console.log(reqName, " 로그인 성공");
   
   res.send({ result : true, msg : "로그인 성공" });
 
@@ -121,39 +131,46 @@ router.post("/logout", (req, res, next) => {
 
 router.post("/makeRoom", (req, res, next) => {
 
+  
   if (!checkSession(req.session.user)) {
+    console.log("요청 오류");
     res.send("잘못된 요청입니다.");
     return;
   }
-
+  /*
   if (req.body.TOKEN != req.session.TOKEN) {
+    console.log("세션 오류");
     res.send("유효하지 않은 세션입니다.");
     return;
   }
-
+  */
+  /*
   var pwd = {
     hostName : req.body.hostName,
     pwd : req.body.password
-  }
+  }*/
 
-  console.log(pwd.pwd);
-
-  var index = -1;
+  var index = app.roomIndex.pop();
+  
+  /*
   for (var i = 0; i < app.MAX_ROOM; i++) {
     if (isEmpty(app.nowRooms[i])) {
       index = i;
       break;
     }
   }
+  */
 
-  if (index > -1){
-    app.nowRooms[index] = new gameClass.GAME(index, req.body.hostName);
-    if (pwd.pwd != ''){
+  if (index != undefined){
+    app.nowRooms[index] = new gameClass.GAME(index, req.body.hostName, req.body.password);
+    if (app.nowRooms[index].pwd != ''){
       app.nowRooms[index].isLocked = true;
     }
-    app.nowPwds[index] = pwd;
+    //app.nowPwds[index] = pwd;
     req.session.user.room = index;
     app.nowRooms[index].createNewPlayer(req.body.hostName);
+    console.log(req.body.hostName, " ", index, " ", app.nowRooms[index].pwd, " : maked");
+    
     res.send({ index : index });
   }
   else {
@@ -179,12 +196,12 @@ router.post("/enterRoom", (req, res, next) => {
     return;
   }
 
-  if (app.nowRooms[index].hostName == gameId && app.nowPwds[index].hostName == gameId){
+  if (app.nowRooms[index].hostName == gameId){
     if (app.nowRooms[index].isPlaying){
       res.send({result : false});
       return;
     }
-    else if (!app.nowRooms[index].isLocked || app.nowPwds[index].pwd === pwd) {
+    else if (!app.nowRooms[index].isLocked || app.nowRooms[index].pwd == pwd) {
       app.nowRooms[index].createNewPlayer(playerId);
       req.session.user.room = index;
       res.send({result : true});
