@@ -38,6 +38,8 @@ exports.GAME = class game {
         
         this.MAX_PLAYER = 5;
         this.NOW_PLAYER = 0;
+
+        this.timeOutList = [];
         
         // 클라이언트로 보낼 게임 정보
         this.gameInfo = {
@@ -72,6 +74,35 @@ exports.GAME = class game {
         this.playerDeck.push([]);
         this.holdOutDeck.push([]);
         this.NOW_PLAYER++;
+    }
+
+    // 플레이어 제거
+    deletePlayer = (name) => {
+
+        var index = this.getPlayerIndex(name);
+
+        // 방에서 플레이어 정보 제거
+        this.players.splice(index, 1);
+        this.holdOutDeck.splice(index, 1);
+        this.playerDeck.splice(index, 1);
+        
+        this.gameInfo.players.splice(index, 1);
+        this.NOW_PLAYER--;
+
+        // 현재 차례인 사람이 나갔을 시 
+        if (this.gameInfo.nowTurn == index){
+            this.gameInfo.nowTurn++;
+            this.gameInfo.nowTurn %= this.NOW_PLAYER;
+        }
+
+        // 나간 사람이 호스트 일 시 호스트 권한 이동
+        if (this.hostName == name && this.NOW_PLAYER > 0) {
+            console.log("호스트이동");
+            this.hostName = this.players[0];
+            this.gameInfo.hostName = this.hostName;
+            console.log(this.hostName);
+        }
+
     }
 
     // 이름으로 인덱스 얻기

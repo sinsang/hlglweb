@@ -189,7 +189,7 @@ exports.gameStart = (socket, io, info) => {
   }
   if (isHost(info, socket)){
     
-    app.nowRooms[info.index].gameStart(2);
+    app.nowRooms[info.index].gameStart(300);
     io.sockets.in(info.index).emit("timeCount", app.nowRooms[info.index].time);
   
     io.sockets.in(info.index).emit("notice", "게임이 시작되었습니다.");
@@ -228,6 +228,8 @@ exports.disconnect = (socket, io) => {
   var room = socket.handshake.session.user.room;
   var hostName = app.nowRooms[room].hostName;
 
+  var time = 10 * 1000;   // 재접속 가능 시간 
+
   if (isEmpty(app.nowRooms[room])){
     return;
   }
@@ -236,38 +238,30 @@ exports.disconnect = (socket, io) => {
     var index = app.nowRooms[room].players.indexOf(player);
     console.log(player + "님이 " + hostName + "의 방에서 나감 ");
     
-    // 방에서 플레이어 정보 제거
-    app.nowRooms[room].players.splice(index, 1);
-    app.nowRooms[room].holdOutDeck.splice(index, 1);
-    app.nowRooms[room].playerDeck.splice(index, 1);
-    
-    app.nowRooms[room].gameInfo.players.splice(index, 1);
-    app.nowRooms[room].NOW_PLAYER--;
+    app.nowRooms[room].timeOutList.push(
+      {
+        player : player,
+        event : setTimeout(() => {
+          console.log(player + "나감");
+          app.nowRooms[room].deletePlayer(player);
 
-    // 현재 차례인 사람이 나갔을 시 
-    if (app.nowRooms[room].gameInfo.nowTurn == index){
-      app.nowRooms[room].gameInfo.nowTurn++;
-      app.nowRooms[room].gameInfo.nowTurn %= app.nowRooms[room].NOW_PLAYER;
-    }
+          socket.handshake.session.user.room = -1;
 
-    // 나간 사람이 호스트 일 시 호스트 권한 이동
-    if (isHost({index : room, playerId : player, hostName : hostName}, socket) && app.nowRooms[room].NOW_PLAYER > 0) {
-      app.nowRooms[room].hostName = app.nowRooms[room].players[app.nowRooms[room].gameInfo.nowTurn];
-      app.nowPwds[room].hostName = app.nowRooms[room].players[app.nowRooms[room].gameInfo.nowTurn];
-    }
+          if (app.nowRooms[room].NOW_PLAYER < 1){
+            app.roomIndex.push(app.nowRooms[room].id);
+            app.nowRooms[room] = {};
+          }
+          else {
+            if (app.nowRooms[room].isGameSet()){
+              io.sockets.in(room).emit("notice", app.nowRooms[room].gameSet());
+            }
+            console.log("갱신시킴");
+            io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
+          }
+      }, time)
+    });
 
-    socket.handshake.session.user.room = -1;
-
-    if (app.nowRooms[room].NOW_PLAYER < 1){
-      app.roomIndex.push(app.nowRooms[room].id);
-      app.nowRooms[room] = {};
-    }
-    else {
-      if (app.nowRooms[room].isGameSet()){
-        io.sockets.in(room).emit("notice", app.nowRooms[room].gameSet());
-      }
-      io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
-    }
+    console.log(app.nowRooms[room].timeOutList);
 
   }
 

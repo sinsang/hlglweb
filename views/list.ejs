@@ -61,13 +61,13 @@
         $(".room").each((index, item) => {
             $(item).click((e) => {
 
-                roomIndex = $(item).attr("index") * 1;
-                hostName = $(item).attr("hostName");
-                isLocked = eval($(item).attr("lock"));
-                isPlaying = eval($(item).attr("isPlaying"))
-                pwd = null;
-                playerId = "<%= user.name %>";
-                TOKEN = "<%= TOKEN %>";
+                var roomIndex = $(item).attr("index") * 1;
+                var hostName = $(item).attr("hostName");
+                var isLocked = eval($(item).attr("lock"));
+                var isPlaying = eval($(item).attr("isPlaying"))
+                var pwd = null;
+                var playerId = "<%= user.name %>";
+                var TOKEN = "<%= TOKEN %>";
                 
                 if (isPlaying) {
                     alert("해당 방은 이미 플레이 중입니다.");

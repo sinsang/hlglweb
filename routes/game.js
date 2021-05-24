@@ -24,9 +24,19 @@ function UUID() {
   });
 }
 
+function sessionGameCheck(s) {
+  if (s.user.room != -1) {
+    return true;
+  }
+  return false;
+}
+
 /* GET home page. */
 router.get("/login", (req, res, next) => {
-  if (req.session.user){
+  if (checkSession(req.session.user)){
+    if (sessionGameCheck(req.session)){
+      //res.redirect("../game/play/" + req.session.user.room);
+    }
     res.redirect("../game/list");
   }
   else{
@@ -35,8 +45,13 @@ router.get("/login", (req, res, next) => {
 });
 
 router.get("/list", (req, res) => {
-  //console.log(req.session.user);
-  if (req.session.user){
+
+  if (checkSession(req.session.user)){
+    console.log(req.session.user);
+    if (sessionGameCheck(req.session)){
+      //res.redirect("../game/play/" + req.session.user.room);
+      //return;
+    }
 
     var rooms = []
     for (var i = 0; i < app.nowRooms.length; i++){
@@ -44,8 +59,6 @@ router.get("/list", (req, res) => {
         rooms.push(app.nowRooms[i].gameInfo);
       }
     }
-
-    console.log(rooms);
 
     res.render('list', {
       user : req.session.user,
@@ -64,6 +77,17 @@ router.get("/play/:roomNum", (req, res, next) => {
     res.send("잘못된 접근입니다.");
   }
   else if (app.nowRooms[req.params.roomNum].players.indexOf(req.session.user.name) != -1){
+
+    console.log(req.session.user.name);
+    for (var i = 0; i < app.nowRooms[req.params.roomNum].timeOutList.length; i++){
+      if (app.nowRooms[req.params.roomNum].timeOutList[i].player == req.session.user.name) {
+        console.log(app.nowRooms[req.params.roomNum].timeOutList[i].player);
+        clearTimeout(app.nowRooms[req.params.roomNum].timeOutList[i].event);
+        app.nowRooms[req.params.roomNum].timeOutList.splice(i, 1);
+        break;
+      }
+    }
+
     res.render("hlglGame", {
       roomNum : req.params.roomNum,
       hostName : app.nowRooms[req.params.roomNum].hostName,
@@ -135,44 +159,30 @@ router.post("/logout", (req, res, next) => {
 
 router.post("/makeRoom", (req, res, next) => {
 
-  
   if (!checkSession(req.session.user)) {
     console.log("요청 오류");
     res.send("잘못된 요청입니다.");
     return;
   }
-  /*
+  
   if (req.body.TOKEN != req.session.TOKEN) {
     console.log("세션 오류");
     res.send("유효하지 않은 세션입니다.");
     return;
   }
-  */
-  /*
-  var pwd = {
-    hostName : req.body.hostName,
-    pwd : req.body.password
-  }*/
 
   var index = app.roomIndex.pop();
-  
-  /*
-  for (var i = 0; i < app.MAX_ROOM; i++) {
-    if (isEmpty(app.nowRooms[i])) {
-      index = i;
-      break;
-    }
-  }
-  */
 
   if (index != undefined){
     app.nowRooms[index] = new gameClass.GAME(index, req.body.hostName, req.body.password);
+    
     if (app.nowRooms[index].pwd != ''){
       app.nowRooms[index].isLocked = true;
     }
-    //app.nowPwds[index] = pwd;
+
     req.session.user.room = index;
     app.nowRooms[index].createNewPlayer(req.body.hostName);
+
     console.log(req.body.hostName, " ", index, " ", app.nowRooms[index].pwd, " : maked");
     
     res.send({ index : index });
@@ -191,7 +201,7 @@ router.post("/enterRoom", (req, res, next) => {
   }
 
   var index = req.body.index;
-  var gameId = req.body.gameId;
+  var hostName = req.body.hostName;
   var pwd = req.body.pwd;
   var playerId = req.body.playerId;
 
@@ -200,14 +210,15 @@ router.post("/enterRoom", (req, res, next) => {
     return;
   }
 
-  if (app.nowRooms[index].hostName == gameId){
+  if (app.nowRooms[index].hostName == hostName){
+    console.log("호스트맞음");
     if (app.nowRooms[index].isPlaying){
       res.send({result : false});
       return;
     }
     else if (!app.nowRooms[index].isLocked || app.nowRooms[index].pwd == pwd) {
       app.nowRooms[index].createNewPlayer(playerId);
-      req.session.user.room = index;
+      req.session.user.room = index;  // 세션에 방 정보
       res.send({result : true});
       return;
     }
