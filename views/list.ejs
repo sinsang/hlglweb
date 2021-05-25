@@ -53,6 +53,25 @@
     <script src="../javascripts/jquery-3.6.0.min.js"></script>
     <script src="../javascripts/socket.io.js"></script>
     <script>
+
+        if (<%= user.room %> != -1) {
+            if (confirm("현재 참여 중인 방이 있습니다. 재접속 하시겠습니까?")) {
+                window.location.href = "../game/play/" + <%= user.room %>;
+            }
+            else {
+                console.log("초기화");
+                $.ajax({
+                    url : "../game/clearRoomInUserInfo",
+                    data : { TOKEN : "<%= TOKEN %>" },
+                    type : "POST",
+                    dataType : "json"
+                })
+                .done((data) => {
+                    location.reload();
+                });
+            }
+        }
+
         $(".hamburger").click((e) => {
             document.querySelector(".hamburger").classList.toggle("is-active");
             $("#menu").slideToggle("fast");

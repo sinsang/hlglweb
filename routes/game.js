@@ -47,11 +47,6 @@ router.get("/login", (req, res, next) => {
 router.get("/list", (req, res) => {
 
   if (checkSession(req.session.user)){
-    console.log(req.session.user);
-    if (sessionGameCheck(req.session)){
-      //res.redirect("../game/play/" + req.session.user.room);
-      //return;
-    }
 
     var rooms = []
     for (var i = 0; i < app.nowRooms.length; i++){
@@ -65,6 +60,7 @@ router.get("/list", (req, res) => {
       TOKEN : req.session.TOKEN,
       rooms : rooms
     });
+
   }
   else{
     res.redirect("../game/login");
@@ -211,14 +207,18 @@ router.post("/enterRoom", (req, res, next) => {
   }
 
   if (app.nowRooms[index].hostName == hostName){
-    console.log("호스트맞음");
     if (app.nowRooms[index].isPlaying){
       res.send({result : false});
       return;
     }
     else if (!app.nowRooms[index].isLocked || app.nowRooms[index].pwd == pwd) {
+      if (app.nowRooms[index].players.indexOf(playerId) != -1){
+        req.session.user.room = index;
+        res.send({result : true});
+        return;
+      }
       app.nowRooms[index].createNewPlayer(playerId);
-      req.session.user.room = index;  // 세션에 방 정보
+      req.session.user.room = index;
       res.send({result : true});
       return;
     }
@@ -226,6 +226,19 @@ router.post("/enterRoom", (req, res, next) => {
   
   res.send({result : false});
 
+});
+
+router.post("/clearRoomInUserInfo", (req, res, next) => {
+  if (checkSession(req.session.user) && req.body.TOKEN == req.session.TOKEN){
+    console.log("초기화함");
+    req.session.user.room = -1;
+    console.log(req.session);
+    res.send(true);
+  }
+  else {
+    console.log("잘못된 방 정보 초기화 발생");
+    res.send(false);
+  }
 });
 
 module.exports = router;
