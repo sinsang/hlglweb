@@ -1,62 +1,24 @@
 const e = require("express");
 var app = require("./app");
-
-var checkPlayer = (info, socket) => {
-  return info.playerId == socket.handshake.session.user.name;
-}
-var checkHost = (info) => {
-  return app.nowRooms[info.index].hostName == info.hostName
-}
-var checkInfo = (info) => {
-  if (info.index == undefined || info.index == null || typeof info.index != "number") {
-    return false;
-  }
-  if (info.hostName == undefined || info.hostName == null || typeof info.hostName != "string") {
-    return false;
-  }
-  if (info.playerId == undefined || info.playerId == null || typeof info.playerId != "string") {
-    return false;
-  }
-  if (info.TOKEN == undefined || info.TOKEN == null || typeof info.TOKEN != "string") {
-    return false;
-  }
-  
-  return true;
-}
-var isHost = (info, socket) => {
-  return checkPlayer(info, socket) && app.nowRooms[info.index].hostName == info.playerId;
-}
-function isEmpty(param) {
-  return Object.keys(param).length === 0;
-}
-function checkSession (session) {
-  if (session == undefined) {
-    console.log("유효하지 않은 세션의 요청");
-    return false;
-  }
-  return true;
-}
-function checkToken (socket, TOKEN) {   // TOKEN을 통해 위조된 요청 감지
-  return TOKEN == socket.handshake.session.TOKEN;
-}
+var funcs = require("./funcs");
 
 // socket Fucntion
 exports.joinRoom = (socket, io, info) => {
   
-  if (!checkSession(socket.handshake.session.user)){
+  if (!funcs.checkSession(socket.handshake.session.user)){
     return;
   }
-  if (!checkInfo(info)){
+  if (!funcs.checkInfo(info)){
     return;
   }
-  if (!checkToken(socket, info.TOKEN)) {
+  if (!funcs.checkToken(socket, info.TOKEN)) {
     return;
   }
-  if (isEmpty(app.nowRooms[info.index])){
+  if (funcs.isEmpty(app.nowRooms[info.index])){
     return;
   }
 
-  if (checkPlayer(info, socket) && checkHost(info)){
+  if (funcs.checkPlayer(info, socket) && funcs.checkHost(app, info)){
     socket.join(info.index);
     io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
   }
@@ -68,19 +30,19 @@ exports.joinRoom = (socket, io, info) => {
 
 exports.hitBell = (socket, io, info) => {
 
-  if (!checkSession(socket.handshake.session.user)){
+  if (!funcs.checkSession(socket.handshake.session.user)){
     return;
   }
-  if (!checkInfo(info)){
+  if (!funcs.checkInfo(info)){
     return;
   }
-  if (!checkToken(socket, info.TOKEN)) {
+  if (!funcs.checkToken(socket, info.TOKEN)) {
     return;
   }
-  if (isEmpty(app.nowRooms[info.index])){
+  if (funcs.isEmpty(app.nowRooms[info.index])){
     return;
   }
-  if (checkPlayer(info, socket) && checkHost(info)){
+  if (funcs.checkPlayer(info, socket) && funcs.checkHost(app, info)){
 
     io.sockets.in(info.index).emit("ring"); // bell sound
 
@@ -124,19 +86,19 @@ exports.hitBell = (socket, io, info) => {
 
 exports.holdOutCard = (socket, io, info) => {
   
-  if (!checkSession(socket.handshake.session.user)){
+  if (!funcs.checkSession(socket.handshake.session.user)){
     return;
   }
-  if (!checkInfo(info)){
+  if (!funcs.checkInfo(info)){
     return;
   }
-  if (!checkToken(socket, info.TOKEN)) {
+  if (!funcs.checkToken(socket, info.TOKEN)) {
     return;
   }
-  if (isEmpty(app.nowRooms[info.index])){
+  if (funcs.isEmpty(app.nowRooms[info.index])){
     return;
   }
-  if (checkPlayer(info, socket) && checkHost(info)){
+  if (funcs.checkPlayer(info, socket) && funcs.checkHost(app, info)){
     
     switch (app.nowRooms[info.index].holdOutCard(info.playerId)) {
         case 1: // 대기
@@ -175,19 +137,19 @@ exports.holdOutCard = (socket, io, info) => {
 
 exports.gameStart = (socket, io, info) => {
 
-  if (!checkSession(socket.handshake.session.user)){
+  if (!funcs.checkSession(socket.handshake.session.user)){
     return;
   }
-  if (!checkInfo(info)){
+  if (!funcs.checkInfo(info)){
     return;
   }
-  if (!checkToken(socket, info.TOKEN)) {
+  if (!funcs.checkToken(socket, info.TOKEN)) {
     return;
   }
-  if (isEmpty(app.nowRooms[info.index])){
+  if (funcs.isEmpty(app.nowRooms[info.index])){
     return;
   }
-  if (isHost(info, socket)){
+  if (funcs.isHost(app, info, socket)){
     
     app.nowRooms[info.index].gameStart(300);
     io.sockets.in(info.index).emit("timeCount", app.nowRooms[info.index].time);
@@ -220,7 +182,7 @@ exports.gamePause = (socket, io, info) => {
 
 exports.disconnect = (socket, io) => {
 
-  if (!checkSession(socket.handshake.session.user)){
+  if (!funcs.checkSession(socket.handshake.session.user)){
     return;
   }
 
@@ -230,11 +192,11 @@ exports.disconnect = (socket, io) => {
 
   var time = 10 * 1000;   // 재접속 가능 시간 
 
-  if (isEmpty(app.nowRooms[room])){
+  if (funcs.isEmpty(app.nowRooms[room])){
     return;
   }
 
-  if (checkHost({index : room, hostName : hostName}) && app.nowRooms[room].players.indexOf(player) != -1) {
+  if (funcs.checkHost(app, {index : room, hostName : hostName}) && app.nowRooms[room].players.indexOf(player) != -1) {
     var index = app.nowRooms[room].players.indexOf(player);
     console.log(player + "님이 " + hostName + "의 방에서 나감 ");
     
