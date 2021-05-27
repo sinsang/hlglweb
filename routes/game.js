@@ -85,7 +85,7 @@ router.post("/check", (req, res, next) => {
 
   console.log(reqName, " 로그인 시도");
 
-  if (req.session.user) {     // 이미 로그인 세션이 있는 경우
+  if (req.session.user != undefined) {     // 이미 로그인 세션이 있는 경우
     res.send({ result : false, msg : "잘못된 요청입니다."});
     return;
   }
@@ -114,7 +114,7 @@ router.post("/check", (req, res, next) => {
   
   app.nowUsers.push(newUser);
   req.session.user = newUser;
-  req.session.TOKEN = func.UUID();
+  req.session.TOKEN = funcs.UUID();
 
   console.log(reqName, " 로그인 성공");
   
@@ -130,7 +130,7 @@ router.post("/logout", (req, res, next) => {
 
 router.post("/makeRoom", (req, res, next) => {
 
-  if (!func.checkSession(req.session.user)) {
+  if (!funcs.checkSession(req.session.user)) {
     console.log("요청 오류");
     res.send("잘못된 요청입니다.");
     return;

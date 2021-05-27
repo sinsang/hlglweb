@@ -183,6 +183,7 @@ socket.on("notice", (text) => {
 });
 
 socket.on("refresh", (gameInfo) => {
+    console.log(gameInfo);
     game = gameInfo;
     render(game);
 });

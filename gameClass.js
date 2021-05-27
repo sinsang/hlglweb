@@ -142,10 +142,9 @@ exports.GAME = class game {
 
     // 게임종료조건 체크 
     isGameSet = () => {
-        if (this.gameInfo.players.filter(e => e.available === true).length <= 1) {
+        if (this.gameInfo.players.filter(e => e.available === true).length <= 1 && this.gameInfo.nowState != 0 && this.gameInfo.nowState != 3) {
             return true;
         }
-        
         return false;
     }
 

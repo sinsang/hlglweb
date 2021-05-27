@@ -191,6 +191,7 @@ exports.disconnect = (socket, io) => {
   }
 
   if (funcs.checkHost(app, {index : room, hostName : hostName}) && app.nowRooms[room].players.indexOf(player) != -1) {
+
     var index = app.nowRooms[room].players.indexOf(player);
     console.log(player + "님이 " + hostName + "의 방에서 나감 ");
     
@@ -216,9 +217,7 @@ exports.disconnect = (socket, io) => {
           }
       }, time)
     });
-
-    console.log(app.nowRooms[room].timeOutList);
-
+    
   }
 
 }
