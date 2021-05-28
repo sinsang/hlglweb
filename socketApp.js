@@ -198,6 +198,8 @@ exports.disconnect = (socket, io) => {
     app.nowRooms[room].timeOutList.push(
       {
         player : player,
+        leftTime : 10
+        /*
         event : setTimeout(() => {
           console.log(player + "나감");
           app.nowRooms[room].deletePlayer(player);
@@ -214,10 +216,13 @@ exports.disconnect = (socket, io) => {
             }
             console.log("갱신시킴");
             io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
+            console.log("refresh 함");
           }
-      }, time)
-    });
-    
+        }, time)
+        */
+      }
+    );
+
   }
 
 }

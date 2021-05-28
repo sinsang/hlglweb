@@ -21,7 +21,7 @@ exports.checkInfo = (info) => {
 }
 
 exports.isHost = (app, info, socket) => {
-    return checkPlayer(info, socket) && app.nowRooms[info.index].hostName == info.playerId;
+    return info.playerId == socket.handshake.session.user.name && app.nowRooms[info.index].hostName == info.playerId;
 }
 exports.isEmpty = (param) => {
     return Object.keys(param).length === 0;

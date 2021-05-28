@@ -8,6 +8,7 @@ var bodyParser = require("body-parser");
 var session = require("express-session");
 var FileStore = require("session-file-store")(session);
 var ios = require("express-socket.io-session");
+var funcs = require("./funcs");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -78,6 +79,7 @@ app.use(function(err, req, res, next) {
 // socket.io
 app.io = require("socket.io")();
 var socketApp = require("./socketApp");
+const { ftruncateSync } = require('fs');
 app.io.use(ios(session, { autoSave: true }));
 
 app.io.on("connection", (socket) => {
@@ -92,5 +94,24 @@ app.io.on("connection", (socket) => {
   socket.on("getRoom", (info) => {socketApp.getRoom(socket, app.io, info)});
   
 });
+
+setInterval(() => {
+  for (var i = 0; i < this.MAX_ROOM; i++){
+    if (!funcs.isEmpty(this.nowRooms[i])){
+      for (var j = 0; j < this.nowRooms[i].timeOutList.length; j++) {
+        this.nowRooms[i].timeOutList[j].leftTime--;
+        console.log(this.nowRooms[i].timeOutList[j].player + " 남은시간 : " + this.nowRooms[i].timeOutList[j].leftTime);
+        if (this.nowRooms[i].timeOutList[j].leftTime <= 0){
+          console.log(this.nowRooms[i].timeOutList[j].player + " 지움");
+          this.nowRooms[i].deletePlayer(this.nowRooms[i].timeOutList[j].player);
+          this.nowRooms[i].timeOutList.splice(j, 1);
+
+          app.io.sockets.in(j).emit("refresh", this.nowRooms[i].gameInfo);
+          j--;
+        }
+      }
+    }
+  }
+}, 1000);
 
 module.exports = app;

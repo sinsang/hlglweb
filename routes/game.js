@@ -49,12 +49,11 @@ router.get("/play/:roomNum", (req, res, next) => {
   }
   else if (app.nowRooms[req.params.roomNum].players.indexOf(req.session.user.name) != -1){
 
-    console.log(req.session.user.name);
     for (var i = 0; i < app.nowRooms[req.params.roomNum].timeOutList.length; i++){
       if (app.nowRooms[req.params.roomNum].timeOutList[i].player == req.session.user.name) {
-        console.log(app.nowRooms[req.params.roomNum].timeOutList[i].player);
-        clearTimeout(app.nowRooms[req.params.roomNum].timeOutList[i].event);
+        //clearTimeout(app.nowRooms[req.params.roomNum].timeOutList[i].event);
         app.nowRooms[req.params.roomNum].timeOutList.splice(i, 1);
+        console.log(req.session.user.name + "타임아웃 지움")
         break;
       }
     }
@@ -65,6 +64,7 @@ router.get("/play/:roomNum", (req, res, next) => {
       player : req.session.user,
       TOKEN : req.session.TOKEN
     });
+
   }
   else {
     res.send("잘못된 접근입니다.");
