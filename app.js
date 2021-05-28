@@ -112,9 +112,9 @@ setInterval(() => {
           this.nowRooms[i].timeOutList.splice(j, 1);
 
           if (this.nowRooms[i].isGameSet()){
-            app.io.sockets.in(room).emit("notice", this.nowRooms[i].gameSet());
+            app.io.sockets.in(i).emit("notice", this.nowRooms[i].gameSet());
           }
-          app.io.sockets.in(j).emit("refresh", this.nowRooms[i].gameInfo);
+          app.io.sockets.in(i).emit("refresh", this.nowRooms[i].gameInfo);
           j--;
         }
       }
