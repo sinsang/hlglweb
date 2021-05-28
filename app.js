@@ -106,6 +106,9 @@ setInterval(() => {
           this.nowRooms[i].deletePlayer(this.nowRooms[i].timeOutList[j].player);
           this.nowRooms[i].timeOutList.splice(j, 1);
 
+          if (app.nowRooms[room].isGameSet()){
+            app.io.sockets.in(room).emit("notice", this.nowRooms[i].gameSet());
+          }
           app.io.sockets.in(j).emit("refresh", this.nowRooms[i].gameInfo);
           j--;
         }
