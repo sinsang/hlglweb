@@ -99,14 +99,19 @@ setInterval(() => {
   for (var i = 0; i < this.MAX_ROOM; i++){
     if (!funcs.isEmpty(this.nowRooms[i])){
       for (var j = 0; j < this.nowRooms[i].timeOutList.length; j++) {
+
         this.nowRooms[i].timeOutList[j].leftTime--;
+
         console.log(this.nowRooms[i].timeOutList[j].player + " 남은시간 : " + this.nowRooms[i].timeOutList[j].leftTime);
+
         if (this.nowRooms[i].timeOutList[j].leftTime <= 0){
+
           console.log(this.nowRooms[i].timeOutList[j].player + " 지움");
+
           this.nowRooms[i].deletePlayer(this.nowRooms[i].timeOutList[j].player);
           this.nowRooms[i].timeOutList.splice(j, 1);
 
-          if (app.nowRooms[room].isGameSet()){
+          if (this.nowRooms[i].isGameSet()){
             app.io.sockets.in(room).emit("notice", this.nowRooms[i].gameSet());
           }
           app.io.sockets.in(j).emit("refresh", this.nowRooms[i].gameInfo);
