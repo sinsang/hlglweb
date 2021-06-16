@@ -31,7 +31,6 @@ exports.checkSession = (session) => {
       console.log("유효하지 않은 세션의 요청");
       return false;
     }
-    console.log("세션체크 완료");
     return true;
 }
 exports.checkToken = (socket, TOKEN) => {   // TOKEN을 통해 위조된 요청 감지

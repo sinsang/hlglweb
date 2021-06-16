@@ -2,7 +2,7 @@ module.exports = {
     apps : [{
       name: "HLGL",
       script: "./bin/www",
-      instances: "max",
+      instances: 1,
       env: {
         NODE_ENV: "development",
       },
