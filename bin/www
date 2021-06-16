@@ -83,6 +83,7 @@ function onError(error) {
  */
 
 function onListening() {
+  process.send('ready');
   var addr = server.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
