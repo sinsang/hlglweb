@@ -91,7 +91,7 @@ app.io.on("connection", (socket) => {
   socket.on("gameStart", (info) => {socketApp.gameStart(socket, app.io, info)});
   socket.on("disconnect", () => {socketApp.disconnect(socket, app.io)});
 
-  socket.on("getRoom", (info) => {socketApp.getRoom(socket, app.io, info)});
+  //socket.on("getRoom", (info) => {socketApp.getRoom(socket, app.io, info)});
   
 });
 
@@ -99,19 +99,25 @@ setInterval(() => {
   for (var i = 0; i < this.MAX_ROOM; i++){
     if (!funcs.isEmpty(this.nowRooms[i])){
       for (var j = 0; j < this.nowRooms[i].timeOutList.length; j++) {
-        
         this.nowRooms[i].timeOutList[j].leftTime--;
 
         if (this.nowRooms[i].timeOutList[j].leftTime <= 0){
-          console.log(i + "번 방 플레이어 " + this.nowRooms[i].timeOutList[j].player + " 퇴장");
-
           this.nowRooms[i].deletePlayer(this.nowRooms[i].timeOutList[j].player);
           this.nowRooms[i].timeOutList.splice(j, 1);
+          
+          console.log(i + "번 방 플레이어 " + this.nowRooms[i].timeOutList[j].player + " 퇴장");
 
-          if (this.nowRooms[i].isGameSet()){
+          if (this.nowRooms[i].players.length == 0) {
+            this.roomIndex.push(app.nowRooms[i].id);
+            this.nowRooms[i] = {};
+            console.log(i + "번 방 삭제");
+          }
+
+          else if (this.nowRooms[i].isGameSet()){
             app.io.sockets.in(i).emit("notice", this.nowRooms[i].gameSet());
           }
           app.io.sockets.in(i).emit("refresh", this.nowRooms[i].gameInfo);
+          
           j--;
         }
       }

@@ -4,7 +4,7 @@ var funcs = require("./funcs");
 
 // socket Fucntion
 exports.joinRoom = (socket, io, info) => {
-  
+  const location = "socket joinRoom : ";
   if (!funcs.checkSession(socket.handshake.session.user)){
     return;
   }
@@ -23,12 +23,13 @@ exports.joinRoom = (socket, io, info) => {
     io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
   }
   else {
-    console.log("잘못된 접근 : " + socket.handshake.session);
+    console.log(location + socket.handshake.session + " 유효하지 않은 요청");
   }
 
 };
 
 exports.hitBell = (socket, io, info) => {
+  const location = "socket hitBell : ";
 
   if (!funcs.checkSession(socket.handshake.session.user)){
     return;
@@ -80,11 +81,12 @@ exports.hitBell = (socket, io, info) => {
     }
   }
   else {
-    console.log("잘못된 접근 : " + socket.handshake.session);
+    console.log(location + socket.handshake.session + " 유효하지 않은 요청");
   }
 };
 
 exports.holdOutCard = (socket, io, info) => {
+  const location = "socket holdOutCard : ";
   
   if (!funcs.checkSession(socket.handshake.session.user)){
     return;
@@ -131,11 +133,12 @@ exports.holdOutCard = (socket, io, info) => {
       }
   }
   else {
-    console.log("잘못된 접근 : " + socket.handshake.session);
+    console.log(location + socket.handshake.session + " 유효하지 않은 요청");
   }
 };
 
 exports.gameStart = (socket, io, info) => {
+  const location = "socket gameStart : ";
 
   if (!funcs.checkSession(socket.handshake.session.user)){
     return;
@@ -169,12 +172,13 @@ exports.gameStart = (socket, io, info) => {
 
   }
   else {
-    console.log("잘못된 접근 : " + socket.handshake.session);
+    console.log(location + socket.handshake.session + " 유효하지 않은 요청");
   }
 
 }
 
 exports.disconnect = (socket, io) => {
+  const location = "socket disconnect : ";
 
   if (!funcs.checkSession(socket.handshake.session.user)){
     return;
@@ -193,33 +197,13 @@ exports.disconnect = (socket, io) => {
   if (funcs.checkHost(app, {index : room, hostName : hostName}) && app.nowRooms[room].players.indexOf(player) != -1) {
 
     var index = app.nowRooms[room].players.indexOf(player);
-    console.log(player + "님이 " + hostName + "의 방에서 나감 ");
+    
+    console.log(location + room + "번 방의 플레이어 " + player + " 퇴장 예약");
     
     app.nowRooms[room].timeOutList.push(
       {
         player : player,
         leftTime : 10
-        /*
-        event : setTimeout(() => {
-          console.log(player + "나감");
-          app.nowRooms[room].deletePlayer(player);
-
-          socket.handshake.session.user.room = -1;
-
-          if (app.nowRooms[room].NOW_PLAYER < 1){
-            app.roomIndex.push(app.nowRooms[room].id);
-            app.nowRooms[room] = {};
-          }
-          else {
-            if (app.nowRooms[room].isGameSet()){
-              io.sockets.in(room).emit("notice", app.nowRooms[room].gameSet());
-            }
-            console.log("갱신시킴");
-            io.sockets.in(room).emit("refresh", app.nowRooms[room].gameInfo);
-            console.log("refresh 함");
-          }
-        }, time)
-        */
       }
     );
 

@@ -97,10 +97,10 @@ exports.GAME = class game {
 
         // 나간 사람이 호스트 일 시 호스트 권한 이동
         if (this.hostName == name && this.NOW_PLAYER > 0) {
-            console.log("호스트이동");
             this.hostName = this.players[0];
             this.gameInfo.hostName = this.hostName;
-            console.log(this.hostName);
+
+            console.log(this.id + "번 방 호스트 " + this.hostName + "으로 변경");
         }
 
     }
@@ -138,6 +138,8 @@ exports.GAME = class game {
         this.gameInfo.nowTurn = 0;
         this.gameInfo.nowState = 1;
 
+        console.log(this.id + "번 방 게임시작")
+
     }
 
     // 게임종료조건 체크 
@@ -165,6 +167,8 @@ exports.GAME = class game {
         for (var i = 0; i < result.length; i++){
             resultText += (i*1 + 1) + "위 : " + result[i].name + ", " + result[i].leftCards + " 장 <br/>";
         }
+
+        console.log(this.id + "번 방 게임종료");
 
         return resultText;
     }

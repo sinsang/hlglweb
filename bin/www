@@ -7,6 +7,15 @@
 var app = require('../app');
 var debug = require('debug')('hlgl:server');
 var http = require('http');
+var pio = require("@pm2/io");
+
+pio.init({
+  metrics: {
+    network: {
+      ports: true
+    }
+  }
+});
 
 /**
  * Get port from environment and store in Express.
