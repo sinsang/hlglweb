@@ -100,7 +100,7 @@ exports.GAME = class game {
             this.hostName = this.players[0];
             this.gameInfo.hostName = this.hostName;
 
-            console.log(this.id + "번 방 호스트 " + this.hostName + "으로 변경");
+            console.log(this.gameInfo.id + "번 방 호스트 " + this.hostName + "으로 변경");
         }
 
     }
@@ -138,7 +138,7 @@ exports.GAME = class game {
         this.gameInfo.nowTurn = 0;
         this.gameInfo.nowState = 1;
 
-        console.log(this.id + "번 방 게임시작")
+        console.log(this.gameInfo.id + "번 방 게임시작");
 
     }
 
@@ -168,7 +168,7 @@ exports.GAME = class game {
             resultText += (i*1 + 1) + "위 : " + result[i].name + ", " + result[i].leftCards + " 장 <br/>";
         }
 
-        console.log(this.id + "번 방 게임종료");
+        console.log(this.gameInfo.id + "번 방 게임종료");
 
         return resultText;
     }
@@ -181,14 +181,16 @@ exports.GAME = class game {
             return 1;
         }
         if (this.gameInfo.nowTurn != playerIndex) {     // 잘못된 차례
-            //console.log("nowTurn : " + this.gameInfo.nowTurn);
-            //console.log("player : " + playerIndex);
+            console.log(this.gameInfo.id + "번 방 " + player + " 잘못된 차례");
             return 2;
         }
         if (this.playerDeck[playerIndex].length < 1){   // 덱이 빔
             this.nextTurn();
+            console.log(this.gameInfo.id + "번 방 " + player + " 덱이 비어있음");
             return 3;
         }
+
+        console.log(this.gameInfo.id + "번 방 " + player + " 카드 내밂");
 
         var getCard = this.playerDeck[playerIndex].shift();
         
@@ -203,6 +205,7 @@ exports.GAME = class game {
         this.nextTurn();
 
         if (this.gameInfo.players[playerIndex].leftCards < 1) {     // 카드 소진
+            console.log(this.gameInfo.id + "번 방 " + player + " 카드 소진");
             this.gameInfo.players[playerIndex].available = false;
             return 4;
         }
@@ -220,13 +223,20 @@ exports.GAME = class game {
         var playerIndex = this.getPlayerIndex(player);
 
         if (!this.gameInfo.players[playerIndex].available) {    // 종을 친 플레이어가 생존상태가 아닐 때
+            console.log(this.gameInfo.id + "번 방 " + player + " 죽었는데 종 침");
             return 1;
         }
         
         if (this.surfaceCardsSum.indexOf(5) != -1) {    // 승리
+            
+            this.gameInfo.nowState = 2;             // 카드 분배 중 일시정지                                       
+            this.gameInfo.nowTurn = playerIndex;    // 이긴 사람부터 다시시작
+
+            console.log(this.gameInfo.id + "번 방 " + player + " 승리, 카드 수거");
 
             // 내민 카드 정보 정리
             this.surfaceCardsSum = [0,0,0,0];
+
             for (var i = 0; i < this.NOW_PLAYER; i++) {
                 var len = this.holdOutDeck[i].length;
                 for (var j = 0; j < len; j++){
@@ -237,21 +247,20 @@ exports.GAME = class game {
 
             // 내민 카드들 승자에게
             for (var i = 0; i < this.NOW_PLAYER; i++){
-                var len = this.holdOutDeck[i].length;
-                for (var j = 0; j < len; j++){
-                this.playerDeck[playerIndex].push(this.holdOutDeck[i].pop());
+                for (var j = 0; j < this.holdOutDeck[i].length; j++){
+                    this.playerDeck[playerIndex].push(this.holdOutDeck[i].pop());
                 }   
             }
             
             // 게임 정보 업데이트
             this.gameInfo.players[playerIndex].leftCards = this.playerDeck[playerIndex].length;
-            this.gameInfo.nowState = 2;             // 카드 분배 중 일시정지                                       
-            this.gameInfo.nowTurn = playerIndex;    // 이긴 사람부터 다시시작
 
             return 2;
         }
     
         else {  // 잘못 친 경우
+            this.gameInfo.nowState = 2;   // 카드 분배 중 일시정지
+            console.log(this.gameInfo.id + "번 방 " + player + " 종 잘못 침");
 
             for (var i = 0; i < this.NOW_PLAYER; i++){
                 if (this.playerDeck[playerIndex].length < 1) {
@@ -263,8 +272,6 @@ exports.GAME = class game {
                 }   
                 this.gameInfo.players[i].leftCards = this.playerDeck[i].length;
             }
-
-            this.gameInfo.nowState = 2;   // 카드 분배 중 일시정지
 
             return 3;
         }
