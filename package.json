@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "preinstall": "npm install pm2 -g",
-    "start": "pm2 start ecosystem.config.js"
+    "start": "pm2-runtime start ecosystem.config.js --env production"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
