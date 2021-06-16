@@ -1,12 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * Module dependencies.
- */
-
-var app = require('../app');
-var debug = require('debug')('hlgl:server');
-var http = require('http');
 var pio = require("@pm2/io");
 
 pio.init({
@@ -16,6 +8,14 @@ pio.init({
     }
   }
 });
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('hlgl:server');
+var http = require('http');
 
 /**
  * Get port from environment and store in Express.

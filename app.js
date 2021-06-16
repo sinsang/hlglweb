@@ -2,7 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+//var logger = require('morgan');
 var cors = require("cors");
 var bodyParser = require("body-parser");
 var session = require("express-session");
@@ -21,7 +21,7 @@ app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
 app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -102,22 +102,20 @@ setInterval(() => {
         this.nowRooms[i].timeOutList[j].leftTime--;
 
         if (this.nowRooms[i].timeOutList[j].leftTime <= 0){
+          console.log(i + "번 방 플레이어 " + this.nowRooms[i].timeOutList[j].player + " 퇴장");
           this.nowRooms[i].deletePlayer(this.nowRooms[i].timeOutList[j].player);
           this.nowRooms[i].timeOutList.splice(j, 1);
-          
-          console.log(i + "번 방 플레이어 " + this.nowRooms[i].timeOutList[j].player + " 퇴장");
 
           if (this.nowRooms[i].players.length == 0) {
-            this.roomIndex.push(app.nowRooms[i].id);
+            this.roomIndex.push(this.nowRooms[i].gameInfo.id);
             this.nowRooms[i] = {};
             console.log(i + "번 방 삭제");
+            break;
           }
-
           else if (this.nowRooms[i].isGameSet()){
             app.io.sockets.in(i).emit("notice", this.nowRooms[i].gameSet());
           }
           app.io.sockets.in(i).emit("refresh", this.nowRooms[i].gameInfo);
-          
           j--;
         }
       }
