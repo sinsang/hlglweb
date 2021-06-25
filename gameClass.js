@@ -152,7 +152,7 @@ exports.GAME = class game {
 
     // 게임종료, 결과 출력
     gameSet = () => {
-        
+
         clearInterval(this.timeCount);
         var result = this.gameInfo.players.slice();
 
@@ -270,8 +270,9 @@ exports.GAME = class game {
                 }
                 else if (i != playerIndex) {
                     this.playerDeck[i].push(this.playerDeck[playerIndex].pop());
+                    this.gameInfo.players[i].leftCards += 1;
+                    this.gameInfo.players[playerIndex].leftCards -= 1;
                 }   
-                this.gameInfo.players[i].leftCards = this.playerDeck[i].length;
             }
 
             return 3;
