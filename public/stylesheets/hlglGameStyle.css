@@ -54,6 +54,12 @@ header {
 
 #menu li a {
     display: block;
+    color: black;
+}
+
+#menu li a:hover {
+    background-color: rgba(0,0,0,0.4);
+    color: white;
 }
 
 #headTitle {

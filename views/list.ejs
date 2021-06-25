@@ -14,14 +14,12 @@
                     <span class="hamburger-inner"></span>
                 </span> 
             </button>
-            <div id="menu">
-                <%= user.name %>님,<br/>
-                환영합니다.
-                <br/>
-                <form action="../game/logout" method="POST">
-                    <input type="submit" value="로그아웃">
-                </form>
-            </div>
+            <nav id="menu">
+                <div id="hello"><%= user.name %>님 환영합니다.</div>
+                <ul>
+                    <li><a id="logout" href="#">로그아웃</a></li>
+                </ul>
+            </nav>
 
             <div id="gameList">
                 <h2>생성된 방 목록</h2><br/>
@@ -71,6 +69,16 @@
                 });
             }
         }
+
+        $("#logout").click(() => {
+            $.ajax({
+                url : "../game/logout",
+                type : "POST"
+            })
+            .then(() => {
+                location.href = "../game/login";
+            });
+        })
 
         $(".hamburger").click((e) => {
             document.querySelector(".hamburger").classList.toggle("is-active");

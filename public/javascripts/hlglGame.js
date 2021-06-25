@@ -204,6 +204,7 @@ $("#myDeck").click((e) => {
 
 $("#gameStart").click((e) => {
     socket.emit("gameStart", info);
+    //$("#menu").slideUp(500);
     //$("#hostFunc").css("display", "none");
 });
 
