@@ -15,7 +15,7 @@ var preLoading = () => {
     for (var i = 1; i <= 4; i++){
         for (var j = 1; j <= 5; j++){
             var img = new Image();
-            img.src = "../../images/" + i + "_" + j + ".png";
+            img.src = "../../images/" + i + "_" + j + ".jpg";
         }
     }
 }
@@ -76,6 +76,11 @@ var render = (gameInfo) => {
 
     var playerPos = 0;
 
+    // bell location
+    var a = $(window).width() / 2;
+    $("#bellDiv").css("left", a -  50 + "px");
+
+    
     for (var i = 0; i < gameInfo.players.length; i++) {
         if (gameInfo.players[i].name == player) {
             playerPos = i;
@@ -89,11 +94,13 @@ var render = (gameInfo) => {
         var tmp = "<div class=\"anotherPlayer\">" + gameInfo.players[i].name + ":" + gameInfo.players[i].leftCards + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
             tmp += "<div class=\"another card\">";
-            tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
+            tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".jpg\" />";
             tmp += "</div></div>";
         }
         else {
-            tmp += "<div class=\"another card\" style=\"background-color: red;\"></div></div>";
+            tmp += "<div class=\"card\">";
+            tmp += "<img src=\"../../images/HG.jpg\" />";
+            tmp += "</div></div>";;
         }
         $("#anotherPlayersDiv").append(tmp);
     }
@@ -101,21 +108,26 @@ var render = (gameInfo) => {
         var tmp = "<div class=\"anotherPlayer\">" + gameInfo.players[i].name + ":" + gameInfo.players[i].leftCards + "<br/>";
         if (gameInfo.players[i].surfaceCard.num > 0){
             tmp += "<div class=\"card\">";
-            tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".png\" />";
+            tmp += "<img src=\"../../images/" + gameInfo.players[i].surfaceCard.fruit + "_" + gameInfo.players[i].surfaceCard.num + ".jpg\" />";
             tmp += "</div></div>";
         }
         else {
-            tmp += "<div class=\"another card\" style=\"background-color: red;\"></div></div>";
+            tmp += "<div class=\"card\">";
+            tmp += "<img src=\"../../images/HG.jpg\" />";
+            tmp += "</div></div>";
         }
         $("#anotherPlayersDiv").append(tmp);
     }
 
     if (gameInfo.players[playerPos].surfaceCard.num > 0){
-        var tmp = "<img src=\"../../images/" + gameInfo.players[playerPos].surfaceCard.fruit + "_" + gameInfo.players[playerPos].surfaceCard.num + ".png\" />";
+        var tmp = "<img src=\"../../images/" + gameInfo.players[playerPos].surfaceCard.fruit + "_" + gameInfo.players[playerPos].surfaceCard.num + ".jpg\" />";
     }
     else {
-        var tmp = "<div class=\"card\" id=\"myHoldOutCard\" style=\"background-color: red;\"></div>";
+        var tmp = "<div class=\"card\">";
+        tmp += "<img src=\"../../images/HG.jpg\" />";
+        tmp += "</div></div>";
     }
+
     $("#myHoldOutCard").html(tmp);
 
     // player stat render
@@ -149,6 +161,38 @@ var render = (gameInfo) => {
 
 };
 
+// window resize event
+$(window).resize(() => {
+    anotherPlayersModifyCss();
+    render(game);
+});
+
+// bell event image change
+
+$("#bell").mouseenter(() => {
+    $("#none").stop().hide();
+    $("#on").stop().show();
+    $("#ring").stop().hide();
+});
+
+$("#bell").mouseleave(() => {
+    $("#none").stop().show();
+    $("#on").stop().hide();
+    $("#ring").stop().hide();
+});
+
+$("#bell").mousedown(() => {
+    $("#none").stop().hide();
+    $("#on").stop().hide();
+    $("#ring").stop().show();
+});
+
+$("#bell").mouseup(() => {
+    $("#none").stop().show();
+    $("#on").stop().hide();
+    $("#ring").stop().hide();
+});
+
 // click event
 $("#bell").click((e) => {
     socket.emit("hitBell", info);
@@ -174,7 +218,7 @@ $(".hamburger").click((e) => {
 
 $("#showLog").click((e) => {
     $("#notice").toggle();
-})
+});
 
 // from Server
 socket.on("notice", (text) => {

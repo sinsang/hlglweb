@@ -12,16 +12,14 @@
                     <span class="hamburger-inner"></span>
                 </span> 
             </button>
-            <div id="menu">
+            <nav id="menu">
                 <%= player.name %>
-                <div id="hostFunc" style="display: none;">
-                    <button id="gameStart">게임시작</button>
-                </div>
-                <div id="normalFunc">
-                    <button id="exit">나가기</button>
-                    <button id="showLog">게임 로그</button>
-                </div>
-            </div>
+                <ul>
+                    <li id="hostFunc" style="display: none;"><a id="gameStart" href="#">게임시작</a></li>
+                    <li><a id="showLog" href="#">게임로그</a></li>
+                    <li><a id="exit" href="#">나가기</a></li>
+                </ul>
+            </nav>
             <div id="headTitle">
                 <h2><%= hostName %>님의 할리갈리</h2>
             </div>
@@ -33,14 +31,18 @@
             </div>
 
             <div id="bellDiv">
-                <button id="bell" style="width: 100px; height: 100px;">종</button>
+                <button id="bell">
+                    <img id="none" src="../../images/bell.jpg">
+                    <img id="on" src="../../images/on.jpg" style="display: none;">
+                    <img id="ring" src="../../images/ring.jpg" style="display: none;">
+                </button>
             </div>
 
             <div id="myDiv">
                 <div class="card" id="myHoldOutCard" style="background-color: red;"></div>
                 <br/>
                 <div class="deck" id="myDeck">
-                    <img id="myCard" src="../../images/deck.png"/>
+                    <img id="myCard" src="../../images/HG.jpg"/>
                 </div>
             </div>
             <div id="state">

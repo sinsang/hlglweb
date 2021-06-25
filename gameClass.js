@@ -152,6 +152,7 @@ exports.GAME = class game {
 
     // 게임종료, 결과 출력
     gameSet = () => {
+        
         clearInterval(this.timeCount);
         var result = this.gameInfo.players.slice();
 

@@ -56,22 +56,35 @@ exports.hitBell = (socket, io, info) => {
         io.sockets.in(info.index).emit("notice", info.playerId + "님이 이겼습니다. 카드를 가져가는 중..");
         io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
 
-        setTimeout(() => {  // 2초 후 재시작
-          app.nowRooms[info.index].restart();
-          io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+        if (app.nowRooms[info.index].isGameSet()){
+          io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
           io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
-        }, 2000);
+        }
+        else{
+          setTimeout(() => {  // 2초 후 재시작
+            app.nowRooms[info.index].restart();
+            io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+            io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
+          }, 2000);
+        }
+
         break;
       
       case 3: // 벌칙
         io.sockets.in(info.index).emit("notice", info.playerId + "님이 잘못 종을 쳤습니다. 벌칙으로 카드를 나눠 주는 중..");
         io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
 
-        setTimeout(() => {  // 2초 후 재시작
-          app.nowRooms[info.index].restart();
-          io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+        if (app.nowRooms[info.index].isGameSet()){
+          io.sockets.in(info.index).emit("notice", app.nowRooms[info.index].gameSet());
           io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
-        }, 2000);
+        }
+        else{
+          setTimeout(() => {  // 2초 후 재시작
+            app.nowRooms[info.index].restart();
+            io.sockets.in(info.index).emit("notice", "게임이 다시 시작되었습니다.");
+            io.sockets.in(info.index).emit("refresh", app.nowRooms[info.index].gameInfo);
+          }, 2000);
+        }
         break;
     }  
 
